@@ -1,14 +1,27 @@
 """
-Minimal XM10 USB-CDC 4-channel live monitor.
+XM10 USB-CDC 9-channel live monitor (Squat_EMG_Assist2.c).
 
-This script reads PhAI V2.2 COBS-framed packets directly from the board and
-plots the latest four float values from a selected module, without PhAI Studio.
+채널 매핑 (Squat_EMG_Assist2.c CDC 스트림 기준):
+  ch1 = EMG LH raw           (V)    PF4
+  ch2 = EMG RH raw           (V)    PF3
+  ch3 = L Hip control angle  (deg)
+  ch4 = R Hip control angle  (deg)
+  ch5 = L Assist torque      (Nm)
+  ch6 = R Assist torque      (Nm)
+  ch7 = Squat FSM phase      (0=STAND, 1=DESC, 2=BOTTOM, 3=ASC, 4=RETURN)
+  ch8 = User Intent          (0=DESCEND, 1=HOLD, 2=ASCEND)
+  ch9 = squat_control_ON     (0/1)
+
+GUI 레이아웃 (4단 stacked subplot):
+  ① EMG Envelope (raw V)
+  ② Hip Joint Control Angle (deg)
+  ③ Applied Assist Torque (Nm)
+  ④ Squat FSM Phase + User Intent + Control Toggle
 
 Examples:
     python cdc_4ch_live_monitor.py --port COM6
     python cdc_4ch_live_monitor.py --port /dev/tty.usbmodemXXXX
     python cdc_4ch_live_monitor.py --cli --port COM6
-    python cdc_4ch_live_monitor.py --port COM6 --labels PF3,PF4,PF5,PF6
 """
 
 import argparse
@@ -29,6 +42,21 @@ PHAI_HEADER_SIZE = 6
 PHAI_CRC_SIZE = 2
 DEFAULT_BAUD = 921600
 DEFAULT_MODULE_ID = 0xF0
+NUM_CHANNELS = 9
+
+DEFAULT_LABELS = [
+    "EMG_LH_V",
+    "EMG_RH_V",
+    "Enc_LH_deg",
+    "Enc_RH_deg",
+    "L_Torque_Nm",
+    "R_Torque_Nm",
+    "Squat_Phase",
+    "User_Intent",
+    "Control_ON",
+]
+
+UNITS = ["V", "V", "deg", "deg", "Nm", "Nm", "-", "-", "bool"]
 
 
 def crc16_ccitt(data: bytes) -> int:
@@ -132,7 +160,7 @@ def print_live(labels, values, seq_id, packet_count, rate_hz, module_id):
 
 def run_cli(port: str, baud: int, module_id: int, labels: list[str], print_hz: float):
     print(f"Opening {port} @ {baud}")
-    print(f"Listening for module {format_module(module_id)} with 4 float channels")
+    print(f"Listening for module {format_module(module_id)} with {NUM_CHANNELS} float channels")
     print("Press Ctrl+C to stop.\n")
 
     ser = serial.Serial(port, baud, timeout=0.02)
@@ -178,7 +206,7 @@ def run_cli(port: str, baud: int, module_id: int, labels: list[str], print_hz: f
                 seq_id, mid, _status, values = packet
                 packet_count += 1
 
-                if mid != module_id or len(values) < 4:
+                if mid != module_id or len(values) < NUM_CHANNELS:
                     continue
 
                 matched_count += 1
@@ -186,7 +214,7 @@ def run_cli(port: str, baud: int, module_id: int, labels: list[str], print_hz: f
                 if now - last_print >= 1.0 / print_hz:
                     elapsed = max(now - t0, 1e-6)
                     rate_hz = matched_count / elapsed
-                    print_live(labels, values[:4], seq_id, matched_count, rate_hz, mid)
+                    print_live(labels, values[:NUM_CHANNELS], seq_id, matched_count, rate_hz, mid)
                     last_print = now
 
     except KeyboardInterrupt:
@@ -301,23 +329,32 @@ def run_gui(
 
                         seq_id, mid, _status, values = packet
                         decoded_count += 1
-                        if mid != module_id or len(values) < 4:
+                        if mid != module_id or len(values) < NUM_CHANNELS:
                             continue
 
                         matched_count += 1
                         now = now_abs - t0
                         rate_hz = matched_count / max(now, 1e-6)
-                        self.sample.emit(now, seq_id, tuple(values[:4]), rate_hz, error_count)
+                        self.sample.emit(now, seq_id, tuple(values[:NUM_CHANNELS]), rate_hz, error_count)
             finally:
                 ser.close()
                 self.status.emit("disconnected")
 
+    # 색상 — Left = blue, Right = red (스크린샷 매칭)
+    LH_COLOR = "#1f77b4"
+    RH_COLOR = "#d62728"
+    PHASE_COLOR = "#000000"
+    INTENT_COLOR = "#2ca02c"
+    CTRL_COLOR = "#9467bd"
+
     class MainWindow(QtWidgets.QMainWindow):
         def __init__(self):
             super().__init__()
-            self.setWindowTitle(f"XM10 4ch Live Monitor - module {format_module(module_id)}")
+            self.setWindowTitle(
+                f"XM10 Squat Assist Monitor — module {format_module(module_id)}"
+            )
             self.times = deque()
-            self.values = [deque() for _ in range(4)]
+            self.values = [deque() for _ in range(NUM_CHANNELS)]
             self.curves = []
             self.worker = SerialWorker()
             self.last_plot_update = 0.0
@@ -329,8 +366,9 @@ def run_gui(
             central = QtWidgets.QWidget()
             layout = QtWidgets.QVBoxLayout(central)
             layout.setContentsMargins(10, 10, 10, 10)
-            layout.setSpacing(8)
+            layout.setSpacing(4)
 
+            # ── 상단 상태바 ──────────────────────────────────────────────────
             top_bar = QtWidgets.QHBoxLayout()
             self.status_label = QtWidgets.QLabel("opening serial port...")
             self.status_label.setMinimumHeight(24)
@@ -340,25 +378,94 @@ def run_gui(
             self.record_button.setCheckable(True)
             self.record_button.clicked.connect(self.on_record_clicked)
             top_bar.addWidget(self.record_button)
-
             layout.addLayout(top_bar)
 
-            self.plot = pg.PlotWidget()
-            self.plot.setBackground("w")
-            self.plot.showGrid(x=True, y=True, alpha=0.25)
-            self.plot.setLabel("bottom", "time", units="s")
-            self.plot.setLabel("left", "voltage", units="V")
-            self.plot.addLegend(offset=(10, 10))
-            self.plot.setXRange(0, window_sec)
-            layout.addWidget(self.plot, 1)
+            # ── ① EMG Envelope (raw V) ──────────────────────────────────────
+            self.plot_emg = pg.PlotWidget(title="1. EMG Envelope (근활성도)")
+            self.plot_emg.setBackground("w")
+            self.plot_emg.showGrid(x=True, y=True, alpha=0.25)
+            self.plot_emg.setLabel("left", "Voltage", units="V")
+            self.plot_emg.addLegend(offset=(10, 10))
+            self.plot_emg.setXRange(0, window_sec)
+            self.plot_emg.setYRange(0, 3.5, padding=0)
+            layout.addWidget(self.plot_emg, 3)
+            self.curves.append(
+                self.plot_emg.plot([], [], pen=pg.mkPen(color=LH_COLOR, width=2), name="Left Hip (LH)")
+            )
+            self.curves.append(
+                self.plot_emg.plot([], [], pen=pg.mkPen(color=RH_COLOR, width=2), name="Right Hip (RH)")
+            )
 
-            colors = ["#d62728", "#1f77b4", "#2ca02c", "#9467bd"]
-            for label, color in zip(labels, colors):
-                pen = pg.mkPen(color=color, width=2)
-                self.curves.append(self.plot.plot([], [], pen=pen, name=label))
+            # ── ② Hip Joint Control Angle (deg) ─────────────────────────────
+            self.plot_angle = pg.PlotWidget(title="2. Hip Joint Control Angle (영점 조정 각도)")
+            self.plot_angle.setBackground("w")
+            self.plot_angle.showGrid(x=True, y=True, alpha=0.25)
+            self.plot_angle.setLabel("left", "Angle", units="deg")
+            self.plot_angle.addLegend(offset=(10, 10))
+            self.plot_angle.setXRange(0, window_sec)
+            self.plot_angle.setYRange(-20, 90, padding=0)
+            layout.addWidget(self.plot_angle, 3)
+            self.curves.append(
+                self.plot_angle.plot([], [], pen=pg.mkPen(color=LH_COLOR, width=2), name="Left Hip (LH)")
+            )
+            self.curves.append(
+                self.plot_angle.plot([], [], pen=pg.mkPen(color=RH_COLOR, width=2), name="Right Hip (RH)")
+            )
 
+            # ── ③ Applied Assist Torque (Nm) ────────────────────────────────
+            self.plot_torque = pg.PlotWidget(title="3. Applied Assist Torque (보조 토크 명령)")
+            self.plot_torque.setBackground("w")
+            self.plot_torque.showGrid(x=True, y=True, alpha=0.25)
+            self.plot_torque.setLabel("left", "Torque", units="Nm")
+            self.plot_torque.addLegend(offset=(10, 10))
+            self.plot_torque.setXRange(0, window_sec)
+            self.plot_torque.setYRange(-1, 10, padding=0)
+            layout.addWidget(self.plot_torque, 3)
+            self.curves.append(
+                self.plot_torque.plot([], [], pen=pg.mkPen(color=LH_COLOR, width=2), name="Left Hip (LH)")
+            )
+            self.curves.append(
+                self.plot_torque.plot([], [], pen=pg.mkPen(color=RH_COLOR, width=2), name="Right Hip (RH)")
+            )
+
+            # ── ④ Squat FSM Phase + User Intent + Control Toggle ────────────
+            self.plot_phase = pg.PlotWidget(title="4. Squat FSM Phase, User Intent & Control Toggle")
+            self.plot_phase.setBackground("w")
+            self.plot_phase.showGrid(x=True, y=True, alpha=0.25)
+            self.plot_phase.setLabel("left", "ID / State")
+            self.plot_phase.setLabel("bottom", "time", units="s")
+            self.plot_phase.addLegend(offset=(10, 10))
+            self.plot_phase.setXRange(0, window_sec)
+            self.plot_phase.setYRange(-0.5, 4.5, padding=0)
+            layout.addWidget(self.plot_phase, 2)
+            self.curves.append(
+                self.plot_phase.plot(
+                    [], [], pen=pg.mkPen(color=PHASE_COLOR, width=2),
+                    name="Squat Phase (0:STAND, 1:DESC, 2:BTM, 3:ASC, 4:RET)",
+                )
+            )
+            self.curves.append(
+                self.plot_phase.plot(
+                    [], [], pen=pg.mkPen(color=INTENT_COLOR, width=2, style=QtCore.Qt.DashLine),
+                    name="User Intent (0:DESC, 1:HOLD, 2:ASC)",
+                )
+            )
+            self.curves.append(
+                self.plot_phase.plot(
+                    [], [], pen=pg.mkPen(color=CTRL_COLOR, width=2, style=QtCore.Qt.DashLine),
+                    name="Control Active (1:ON)",
+                )
+            )
+
+            # X축 동기화 (한쪽 줌하면 모두 따라옴)
+            self.plot_angle.setXLink(self.plot_emg)
+            self.plot_torque.setXLink(self.plot_emg)
+            self.plot_phase.setXLink(self.plot_emg)
+
+            # ── 수치 표시 ─────────────────────────────────────────────────────
             self.value_label = QtWidgets.QLabel("")
             self.value_label.setMinimumHeight(28)
+            self.value_label.setWordWrap(True)
             layout.addWidget(self.value_label)
 
             self.record_label = QtWidgets.QLabel("recording: off")
@@ -366,7 +473,7 @@ def run_gui(
             layout.addWidget(self.record_label)
 
             self.setCentralWidget(central)
-            self.resize(1100, 650)
+            self.resize(1200, 980)
 
             self.worker.sample.connect(self.on_sample)
             self.worker.status.connect(self.status_label.setText)
@@ -394,16 +501,16 @@ def run_gui(
             for curve, series in zip(self.curves, self.values):
                 curve.setData(xs, list(series))
 
-            if t > window_sec:
-                self.plot.setXRange(t - window_sec, t, padding=0)
-            else:
-                self.plot.setXRange(0, window_sec, padding=0)
+            x_lo = max(0.0, t - window_sec)
+            x_hi = max(window_sec, t)
+            self.plot_emg.setXRange(x_lo, x_hi, padding=0)
 
             pairs = "    ".join(
-                f"{label}: {value:.4f} V" for label, value in zip(labels, values)
+                f"{label}: {value:.3f} {unit}"
+                for label, value, unit in zip(labels, values, UNITS)
             )
             self.value_label.setText(
-                f"seq: {seq_id}    rate: {rate_hz:.1f} Hz    errors: {error_count}    {pairs}"
+                f"seq: {seq_id}    rate: {rate_hz:.1f} Hz    errors: {error_count}\n{pairs}"
             )
 
         def on_record_clicked(self, checked):
@@ -416,7 +523,7 @@ def run_gui(
         def start_recording(self):
             default_dir = os.path.join(os.path.dirname(__file__), "data")
             os.makedirs(default_dir, exist_ok=True)
-            default_name = f"xm10_4ch_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            default_name = f"xm10_9ch_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
             default_path = os.path.join(default_dir, default_name)
 
             path, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -485,11 +592,17 @@ def parse_module_id(text: str) -> int:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="XM10 USB-CDC 4-channel live monitor")
+    parser = argparse.ArgumentParser(
+        description=f"XM10 USB-CDC {NUM_CHANNELS}-channel live monitor (Squat_EMG_Assist2.c)"
+    )
     parser.add_argument("--port", help="Serial port, e.g. COM6 or /dev/tty.usbmodemXXXX")
     parser.add_argument("--baud", type=int, default=DEFAULT_BAUD)
     parser.add_argument("--module", type=parse_module_id, default=DEFAULT_MODULE_ID)
-    parser.add_argument("--labels", default="PF3,PF4,PF5,PF6")
+    parser.add_argument(
+        "--labels",
+        default=",".join(DEFAULT_LABELS),
+        help=f"Comma-separated {NUM_CHANNELS} channel labels",
+    )
     parser.add_argument("--cli", action="store_true", help="Use terminal output instead of GUI")
     parser.add_argument("--print-hz", type=float, default=20.0)
     parser.add_argument("--plot-hz", type=float, default=60.0)
@@ -503,8 +616,8 @@ def main():
         return
 
     labels = [item.strip() for item in args.labels.split(",") if item.strip()]
-    if len(labels) != 4:
-        print("--labels must contain exactly 4 comma-separated names", file=sys.stderr)
+    if len(labels) != NUM_CHANNELS:
+        print(f"--labels must contain exactly {NUM_CHANNELS} comma-separated names", file=sys.stderr)
         sys.exit(2)
 
     port = args.port or guess_port()

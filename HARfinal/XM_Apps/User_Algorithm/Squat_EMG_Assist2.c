@@ -1,9 +1,18 @@
 /**
  ******************************************************************************
- * @file    Squat_EMG_Assist.c
- * @brief   EMG-proportional squat assist (EMG only, FSR removed).
- *          Built from source blocks in Final_FSR_Fuzzy_Logic.c,
- *          Final_EMG.c, Final_Compensation_AddOn.c, Final_Encoder_ex01.c.
+ * @file    Squat_EMG_Assist2.c
+ * @brief   [v2] User-personalized squat assist (lookup-based, dwell BOTTOM, 500ms ramp).
+ *          Squat_EMG_Assist.c 의 사본 — 원본은 그대로 보존.
+ *
+ *          핵심 변경점 vs v1:
+ *            1) DESCENDING EMG-비례 토크 제거 (compensation만 작용)
+ *            2) ASCENDING/BOTTOM(HOLD) 토크를 사용자 EMG baseline 룩업으로 산출
+ *               - MaxTorque0.csv 분석 기반, sticking point(15-25°)에 max 보조
+ *               - compensation 몫은 룩업이 미리 차감해 둠
+ *            3) BOTTOM 진입을 각도 임계 대신 sliding-window dwell-time 으로 인식
+ *               (사용자가 더 내려가려는 의도면 시스템이 BOTTOM 으로 안 빠짐)
+ *            4) BOTTOM/ASCENDING 토크 인가 시 500ms ramp-in
+ *               (Reinkensmeyer 2009 인간 응답 지연 ~500ms 매치) */
  *
  * ============================================================================
  * Pin mapping
@@ -32,32 +41,74 @@
  * Important Live Expressions variables
  * ============================================================================
  * Write from debugger:
+ *   [Master control]
  *   squat_control_ON              0=disabled  1=request torque
- *   compensation_ON         0=gravity off  1=gravity+friction on
- *   friction_compensation_ON 0=gravity only  1=add friction term
- *   squat_max_torque_nm     ASCENDING 구간 직접 적용 토크 (default 0.5 Nm, 방향 확인 후 최대 2.5 Nm)
- *   assist_torque_limit_nm  최대 허용 토크 (default 2.5 Nm)
- *   encoder_offset_lh_deg / encoder_offset_rh_deg  (read raw angle while standing → input here)
- *   encoder_sign_lh / encoder_sign_rh
- *   gravity_mgl_nm          M*g*L model (start low, 1.0)
- *   compensation_scale      feedforward scale (default 0.20)
- *   squat_enter_threshold_deg  angle to start squat (default 15 deg)
- *   squat_bottom_threshold_deg angle for deep squat (default 45 deg)
- *   squat_stand_threshold_deg  angle to return to STAND (default 5 deg)
- *   cdc_stream_enable       0=CDC off  1=CDC on
- *   cdc_stream_period_ms    CDC period (default 10 ms = 100 Hz)
+ *   compensation_ON               0=gravity off  1=gravity(+friction) on
+ *   friction_compensation_ON      0=gravity only  1=add Coulomb+viscous term
+ *
+ *   [EMG calibration trigger — write 1 to start, auto-cleared on accept]
+ *   emg_cal_rest_request          1 → start REST cal (3 s, stay relaxed)
+ *   emg_cal_effort_request        1 → start EFFORT cal (3 s, max contraction)
+ *   emg_cal_reset_request         1 → revert to offline cal defaults
+ *
+ *   [Torque magnitude / safety]
+ *   squat_max_torque_nm           [v2] 룩업 전역 게인 (default 6.0 = 룩업 그대로,
+ *                                  0.0 → 룩업 비활성=comp만, hard cap 10.0)
+ *   assist_torque_limit_nm        절대 허용 상한 (default 10.0, hard cap 10.0)
+ *   torque_sign                   +1.0 / -1.0 (방향 반전용)
+ *
+ *   [Encoder zeroing]
+ *   encoder_offset_lh_deg / encoder_offset_rh_deg  기립 자세 raw 각도 입력 (default 30.0)
+ *   encoder_sign_lh / encoder_sign_rh              +1.0 / -1.0
+ *
+ *   [Compensation model]
+ *   gravity_mgl_nm                M*g*L (default 8.0)  ※ 룩업 테이블이 이 값 기준으로 차감됨
+ *   compensation_scale            comp 출력 비율 0~1 (default 0.50)  ※ 룩업 설계 기준값
+ *   coulomb_friction_nm           default 0.10
+ *   viscous_friction_nms          default 0.01
+ *   velocity_deadzone_rads        마찰 보상 소신호 컷 (default 0.10)
+ *
+ *   [Squat FSM thresholds]
+ *   squat_enter_threshold_deg     STAND→DESC 임계 (default 15)
+ *   squat_bottom_threshold_deg    [v2] 안전 가드용 (BOTTOM 진입은 dwell 기반)  (default 45)
+ *   squat_stand_threshold_deg     RETURN→STAND 임계 (default 5)
+ *   emg_ascend_threshold          [v2] BOTTOM→ASC EMG 강제 임계 0~1 (default 0.5, 0=비활성)
+ *
+ *   [Ramp tuning]
+ *   assist_ramp_time_ms           [v2] base 토크 0→target 선형 ramp 지속시간 ms
+ *                                  (default 500, 권장 100~500, 0=즉시 step)
+ *                                  ASCEND 가 빠르면 200~300ms 권장
+ *   torque_slew_nm_per_ms         [v2-fix] 출력 토크 최대 변화율 (Nm/ms)
+ *                                  (default 0.02 = 20 Nm/s, 권장 0.01~0.05)
+ *                                  phase 전이 step 차단 → 모터 과전류 트립 방지
+ *                                  너무 낮추면 응답 둔함, 너무 높이면 보호 다시 트립
+ *
+ *   [Dwell tuning — BOTTOM 인식 파라미터]
+ *   dwell_angle_dead_deg          HOLD 진입 임계 (default 1.5°, 좁으면 흔들림에 약함)
+ *   dwell_threshold_ms            dwell 윈도우 길이 (default 200, 짧으면 false HOLD)
+ *   dwell_exit_angle_deg          HOLD 탈출 임계 (default 2.5°, 진입보다 커야 함)
+ *
+ *   [CDC stream]
+ *   cdc_stream_enable             0=CDC off  1=CDC on
+ *   cdc_stream_period_ms          CDC period (default 10 ms = 100 Hz)
  *
  * Observe only:
- *   assist_enable           1 while torque mode is active
- *   assist_mode_active      1 while H10 ASSIST mode
- *   emg_cal_done            1 after both EMG cal steps done
- *   squat_phase             0=STAND 1=DESCENDING 2=BOTTOM 3=ASCENDING 4=RETURN
- *   pf3_volt/pf4_volt       raw EMG voltages
- *   left_encoder_angle_deg / right_encoder_angle_deg  (raw motor shaft angle)
- *   left_control_angle_deg / right_control_angle_deg  (joint angle after gear ratio)
- *   emg_rh_envelope_v / emg_lh_envelope_v
- *   emg_rh_norm / emg_lh_norm  normalised EMG 0..1
- *   left_assist_torque_nm / right_assist_torque_nm
+ *   assist_enable                 1 while torque mode is active
+ *   assist_mode_active            1 while H10 ASSIST mode
+ *   emg_cal_rest_done             1 after REST cal accepted
+ *   emg_cal_effort_done           1 after EFFORT cal accepted
+ *   emg_cal_done                  1 only after BOTH cal steps done (순서: rest → effort)
+ *   squat_phase                   0=STAND 1=DESCENDING 2=BOTTOM 3=ASCENDING 4=RETURN
+ *   pf3_volt / pf4_volt           raw EMG voltages (PF3=RH, PF4=LH)
+ *   emg_rh_raw_v / emg_lh_raw_v   동일 raw (별칭)
+ *   emg_rh_envelope_v / emg_lh_envelope_v   5 Hz LPF envelope
+ *   emg_rh_norm / emg_lh_norm     normalised EMG 0..1
+ *   left_encoder_angle_deg / right_encoder_angle_deg  raw motor shaft angle (누적)
+ *   left_control_angle_deg / right_control_angle_deg  offset/sign 적용 후 joint angle
+ *   left_angular_velocity_rads / right_angular_velocity_rads  5 Hz LPF 적용 후
+ *   left_gravity_torque_nm / right_gravity_torque_nm           M*g*L*sin(θ)
+ *   left_compensation_torque_nm / right_compensation_torque_nm scale*(gravity+fric)
+ *   left_assist_torque_nm / right_assist_torque_nm             최종 명령 토크 (clamp 후)
  *
  * ============================================================================
  * CDC stream (Module ID 0xF0, 8 float channels, 100 Hz)
@@ -154,8 +205,58 @@
 /* Squat FSM debounce */
 #define SQUAT_DEBOUNCE_MS           150U
 
-/* 토크 출력 스무딩 (phase 전환 시 급격한 토크 변화 완화, 5Hz = ~200ms 시정수) */
-#define TORQUE_RAMP_HZ              5.0f
+/* ============================================================================
+ * v2 변경 사항 — 사용자 맞춤 룩업 + Dwell-time + 500ms Ramp
+ * ============================================================================
+ *
+ * [개요] MaxTorque0.csv (사용자 무토크 baseline) 분석 기반 개인화 보조 토크.
+ *
+ *   1. ASCENDING/BOTTOM/DESCENDING 토크를 EMG-비례 대신 각도-룩업으로 산출.
+ *      - 룩업 값 = 사용자 EMG profile × scale - compensation(이미 인가됨)
+ *      - 0-torque 실험은 compensation 없이 측정 → 룩업 테이블이 compensation
+ *        몫을 미리 차감해서 들고 있음. 합쳤을 때 사용자 부담에 맞춰짐.
+ *      - 사용자 sticking point(~15-25°)에서 자동 max 토크 → 가장 필요한 곳 집중.
+ *
+ *   2. BOTTOM phase 진입을 각도 임계 대신 dwell-time으로 인식.
+ *      - 사용자가 의도적으로 깊이 도달 후 정지 → 그제서야 BOTTOM 인정.
+ *      - 시스템 각도 ≥ 45°지만 사용자는 더 내려가려는 경우 → DESCENDING 유지.
+ *      - 모터가 사용자 의도 방해 X.
+ *
+ *   3. BOTTOM/ASCENDING 진입 시 500ms ramp으로 토크 부드럽게 인가.
+ *      - 인간 응답 지연(~500ms, Reinkensmeyer 2009) 매치.
+ *      - 갑작스러운 토크 단차 → 사용자 동시수축 유발 방지. */
+
+/* User-specific ASCEND lookup table — additional torque to add ON TOP of compensation.
+ * Derived from MaxTorque0.csv (single subject, no-torque baseline):
+ *   peak EMG ~1.46V @ 15-20° (sticking point)
+ *   scale ≈ 3.42 Nm/V (peak torque 5 Nm)
+ *   lookup(θ) = max(0, EMG(θ)×scale - compensation(θ))
+ *   여기서 compensation = 0.5 × 8 × sin(θ) (현재 gravity_mgl_nm=8, scale=0.5 기준).
+ * 깊은 각도(55°+)는 compensation 만으로 충분 → 룩업 0.
+ * 다항식 피팅 대신 5° 간격 14점 룩업 + 선형 보간으로 매끄럽게.
+ * 피험자 변경 시 baseline 재측정 후 이 표 갱신. */
+#define USER_LOOKUP_ASCEND_POINTS   14
+#define USER_LOOKUP_BASE_DEG        5.0f
+#define USER_LOOKUP_STEP_DEG        5.0f
+
+/* Dwell-time BOTTOM 인식 파라미터 — Live Expressions 튜닝 가능 (PUBLIC 변수 참조).
+ * 사용자가 의도적으로 정지한 것으로 판정하는 임계.
+ *   dwell_angle_dead_deg : 이 이내 변동은 정지로 간주 (엔코더 분해능 0.022°의 ~70배).
+ *   dwell_threshold_ms   : 이 시간 동안 정지 유지 → BOTTOM 확정.
+ *   dwell_exit_angle_deg : BOTTOM 탈출 임계 (히스테리시스, 진입보다 큰 값). */
+#define DWELL_ANGLE_DEAD_DEG_DEFAULT  1.5f
+#define DWELL_THRESHOLD_MS_DEFAULT    200U
+#define DWELL_EXIT_ANGLE_DEG_DEFAULT  2.5f
+
+/* 보조 토크 ramp-in (BOTTOM/ASCENDING 진입 시).
+ * 기본 500ms = 인간 평균 응답 지연 (Reinkensmeyer 2009 Fig. 2).
+ * 토크가 0 → target 으로 선형 증가. 사용자가 적응할 시간 확보.
+ * [튜닝] 실제 ASCEND 가 ~1초로 빠르면 500ms 가 과해서 sticking point 에서 부분 출력만 나옴.
+ *        Live Expressions 의 assist_ramp_time_ms 를 조정 (권장 범위 100~500ms).
+ *        - 100~200ms: 빠른 동작 매칭, jolt 위험 ↑
+ *        - 250~350ms: 균형점 (권장 시작값)
+ *        - 500ms    : 보수적, 안전 우선 */
+#define ASSIST_RAMP_TIME_MS_DEFAULT 500U
 
 /* ============================================================================
  * ENUMERATIONS AND TYPES
@@ -178,6 +279,16 @@ typedef enum {
     SQUAT_RETURN
 } SquatPhase_t;
 
+/* [v2] 사용자 의도 추정 상태.
+ * BOTTOM phase 내부에서 사용자가 정말 정지했는지(HOLD) 아직 더 내려가려는지
+ * (DESCENDING_INTENT) 구분하기 위한 보조 상태.
+ * Dwell-time 으로 판정. */
+typedef enum {
+    USER_INTENT_DESCEND = 0,  /* 내려가는 중(또는 더 내려가려는 의도) */
+    USER_INTENT_HOLD,         /* 의도적 정지 (dwell 확정) */
+    USER_INTENT_ASCEND        /* 일어나는 중 */
+} UserIntent_t;
+
 /* Button events captured once per loop to prevent double-consume. */
 typedef struct {
     XmBtnEvent_t btn1;
@@ -190,18 +301,20 @@ typedef struct {
  * FSR 제거 후 채널 수 14→8.
  * Add/remove/reorder CDC_STREAM_NEXT rows only.  Keep metadata <= 512 bytes.
  * ============================================================================ */
-/* 채널 순서 (Python 4ch 모니터 기준):
- *   ch1 = PF3 raw EMG RH    ch2 = PF4 raw EMG LH
- *   ch3 = L Torque (Nm)     ch4 = R Torque (Nm)
- *   ch5-8 = envelope/norm/phase/ctrl (부가 채널) */
+/* 채널 순서 — 좌/우 페어 + phase + intent + control 9채널:
+ *   ch1 = EMG LH raw (V)     ch2 = EMG RH raw (V)
+ *   ch3 = L Encoder (deg)    ch4 = R Encoder (deg)
+ *   ch5 = L Torque (Nm)      ch6 = R Torque (Nm)
+ *   ch7 = Squat Phase (0-4)  ch8 = User Intent (0-2)  ch9 = Control ON (bool) */
 #define CDC_STREAM_CHANNELS(F, N)                                               \
-    F(raw_emg_rh,    "PF3 Raw",    "V",    emg_rh_raw_v)                       \
-    N(raw_emg_lh,    "PF4 Raw",    "V",    emg_lh_raw_v)                       \
+    F(emg_lh_raw,    "EMG LH Raw", "V",    emg_lh_raw_v)                       \
+    N(emg_rh_raw,    "EMG RH Raw", "V",    emg_rh_raw_v)                       \
+    N(enc_lh,        "L Encoder",  "deg",  left_control_angle_deg)             \
+    N(enc_rh,        "R Encoder",  "deg",  right_control_angle_deg)            \
     N(l_torque,      "L Torque",   "Nm",   left_assist_torque_nm)              \
     N(r_torque,      "R Torque",   "Nm",   right_assist_torque_nm)             \
-    N(emg_rh_env,    "EMG RH Env", "V",    emg_rh_envelope_v)                  \
-    N(emg_lh_env,    "EMG LH Env", "V",    emg_lh_envelope_v)                  \
-    N(emg_rh_nrm,    "EMG RH Nrm", "-",    emg_rh_norm)                        \
+    N(sq_phase,      "Squat Ph",   "-",    squat_phase)                        \
+    N(usr_intent,    "Intent",     "-",    user_intent)                        \
     N(ctrl_on,       "Control",    "bool", squat_control_ON)
 
 #define CDC_DECLARE_FIELD(field, name, unit, src) float field;
@@ -239,6 +352,28 @@ _Static_assert(sizeof(s_cdc_stream_meta) <= 513U,
  * 에러: 좌우 EMG가 뒤바뀌면 → s_emg_pins 배열 순서 확인. */
 static const XmAdcPin_t s_emg_pins[EMG_COUNT] = {
     XM_EXT_ADC_5, XM_EXT_ADC_6   /* [0]=EMG_RH, [1]=EMG_LH */
+};
+
+/* [v2] 사용자 ASCEND 룩업 테이블 — 룩업 값 = max(0, EMG_baseline × scale - compensation).
+ * 각도 5°~70° 5° 간격, 14점. 선형 보간으로 매끄럽게.
+ * 데이터 출처: MaxTorque0.csv (피험자 무토크 baseline)
+ * 가정: gravity_mgl_nm=8, compensation_scale=0.5 (이 값 변경 시 룩업도 재계산 필요)
+ * 단위: Nm (compensation 외 추가로 인가되는 토크). */
+static const float s_user_lookup_ascend[USER_LOOKUP_ASCEND_POINTS] = {
+    /*  5°  */ 3.94f,
+    /* 10°  */ 3.80f,
+    /* 15°  */ 3.96f,  /* sticking point 최대 보조 */
+    /* 20°  */ 3.51f,
+    /* 25°  */ 2.74f,
+    /* 30°  */ 2.16f,
+    /* 35°  */ 2.07f,
+    /* 40°  */ 1.20f,
+    /* 45°  */ 0.42f,
+    /* 50°  */ 0.21f,
+    /* 55°  */ 0.00f,  /* 깊은 자세는 compensation 만으로 충분 */
+    /* 60°  */ 0.00f,
+    /* 65°  */ 0.00f,
+    /* 70°  */ 0.00f
 };
 static float        s_emg_raw_v[EMG_COUNT];       /* ADC 직결 전압 (~1.65V 기준) */
 static float        s_emg_centered_v[EMG_COUNT];  /* 바이어스 제거 후 (≈0V 기준) */
@@ -333,13 +468,26 @@ static float        s_comp_prev_left_rad;
 static float        s_comp_prev_right_rad;
 
 /* --- Squat FSM --- */
-static SquatPhase_t s_squat_phase;       
+static SquatPhase_t s_squat_phase;
 static uint32_t     s_squat_debounce_tick;
 static bool         s_squat_debounce_active;
 
-/* --- 토크 출력 ramp (phase 전환 스무딩) ------- */
-static float        s_torque_lh_ramp;
-static float        s_torque_rh_ramp;
+/* --- [v2] Dwell-time BOTTOM 인식 --- */
+static UserIntent_t s_user_intent;             /* 현재 의도 추정 */
+static uint32_t     s_dwell_window_start_tick; /* dwell 윈도우 시작 tick */
+static float        s_dwell_window_start_angle;/* dwell 윈도우 시작 각도 */
+
+/* --- [v2] 보조 토크 ramp-in (500ms) --- */
+static uint32_t     s_assist_ramp_tick;   /* ramp 시작 tick */
+static bool         s_assist_ramp_active; /* ramp 진행 중 여부 */
+static bool         s_prev_base_active;   /* 직전 루프 base>0 여부 (edge detect) */
+
+/* --- [v2-fix] 출력 토크 slew-rate limiter (phase 전이 step 완화) ---
+ * 직전 루프 출력값을 기억하고, 다음 루프 출력이 그로부터 너무 멀어지지 않게 제한.
+ * 목적: ASC→RETURN 전이 시 base 가 즉시 0이 되며 발생하는 8 Nm step 차단.
+ * 이 step 이 모터 di/dt 스파이크 → 과전류 보호 트립 → "lost target" 끊김 유발. */
+static float        s_torque_lh_out;
+static float        s_torque_rh_out;
 
 /* --- System --- */
 /* s_assist_session_active: ASSIST 모드 첫 진입 감지용.
@@ -376,6 +524,8 @@ uint16_t emg_cal_rest_done      = 0U;
 uint16_t emg_cal_effort_done    = 0U;
 uint16_t emg_cal_done           = 0U;
 uint16_t squat_phase            = 0U;
+/* [v2] dwell-based user intent (0=DESCEND, 1=HOLD, 2=ASCEND) — observe only */
+uint16_t user_intent            = 0U;
 
 /* EMG raw voltages — PF3=ADC_5(RH), PF4=ADC_6(LH) */
 float pf3_volt;   /* EMG RH raw  */
@@ -417,7 +567,11 @@ float encoder_offset_lh_deg        = 30.0f;
 float encoder_offset_rh_deg        = 30.0f;
 float encoder_sign_lh              = 1.0f;
 float encoder_sign_rh              = 1.0f;
-/* gravity_mgl_nm: 실제 M*g*L 추정값 (성인 70kg 기준 고관절 ~8 Nm).
+/* gravity_mgl_nm: 외골격 본체 팔(링크+액추에이터) 자체의 무게 보상 계수 (~8 Nm).
+ *   M(외골격 팔 ~1.8kg) × g(9.81) × L(COM 거리 ~0.35m) ≈ 6~8 Nm.
+ *   ※ 사용자 몸 무게 보상이 아님 — 사람 70kg 부담은 한쪽 ~60 Nm 인데 과제 10 Nm
+ *      hard cap 으로 불가. 본 시스템은 "외골격 팔 무게는 모터가 받고, 사용자 몸
+ *      무게는 사용자 본인 근력 + 룩업 light-boost 로 처리" 정책.
  * compensation_scale: gravity 토크 중 실제 출력 비율 (0~1). */
 float gravity_mgl_nm               = 8.0f;
 float compensation_scale           = 0.50f;
@@ -434,6 +588,24 @@ float squat_stand_threshold_deg    = 5.0f;
  * avg EMG norm 이 이 값 이상이면 velocity 조건 없이 ASCENDING 진입.
  * 0.0 으로 설정 시 EMG 확정 비활성화 (velocity 조건만 사용). */
 float emg_ascend_threshold         = 0.5f;
+/* [v2] Ramp-in 지속시간 — Live Expressions 튜닝 대상.
+ * 100~500ms 범위 권장. 너무 짧으면 jolt, 너무 길면 sticking 통과 후 토크 도달. */
+uint16_t assist_ramp_time_ms       = ASSIST_RAMP_TIME_MS_DEFAULT;
+
+/* [v2] Dwell-time BOTTOM 인식 파라미터 — Live Expressions 튜닝 가능.
+ * dwell_angle_dead_deg : HOLD 진입 임계 (이 이내 변동은 정지로 간주)
+ * dwell_threshold_ms   : dwell 윈도우 길이 (이 시간 동안 정지 유지하면 HOLD)
+ * dwell_exit_angle_deg : HOLD 탈출 임계 (히스테리시스용, 진입보다 큰 값) */
+float    dwell_angle_dead_deg      = DWELL_ANGLE_DEAD_DEG_DEFAULT;
+uint16_t dwell_threshold_ms        = DWELL_THRESHOLD_MS_DEFAULT;
+float    dwell_exit_angle_deg      = DWELL_EXIT_ANGLE_DEG_DEFAULT;
+
+/* [v2-fix] 출력 토크 slew-rate (Nm 변화량 / 1ms 루프).
+ * 0.02 = 20 Nm/s → 10 Nm step 을 500ms 에 걸쳐 완화.
+ * 너무 작게 (예: 0.005) 하면 응답 느려서 보조 체감 떨어짐.
+ * 너무 크게 (예: 0.1) 하면 step 다시 인가 → 모터 보호 트립 위험.
+ * 권장 범위: 0.01 ~ 0.05 Nm/ms */
+float    torque_slew_nm_per_ms     = 0.02f;
 
 /* ============================================================================
  * FUNCTION PROTOTYPES
@@ -468,6 +640,11 @@ static float _LowPassUpdate(float prev, float input, float cutoff_hz);
 static float _ClampFloat(float value, float lo, float hi);
 static float _AbsFloat(float x);
 static float _SignFloat(float x);
+
+/* [v2] 사용자 룩업 / Dwell / Ramp */
+static float _LookupUserAscend(float angle_deg);
+static void  _UpdateUserIntent(float avg_angle);
+static float _ComputeAssistRamp(bool base_active);
 
 /* ============================================================================
  * PUBLIC ENTRY POINTS
@@ -569,6 +746,12 @@ void User_Loop(void)
         s_squat_phase          = SQUAT_STAND;
         s_squat_debounce_active = false;
         s_comp_prev_valid      = false;
+        /* [v2] dwell/intent/ramp 상태 초기화 */
+        s_user_intent              = USER_INTENT_DESCEND;
+        s_dwell_window_start_tick  = XM_GetTick();
+        s_dwell_window_start_angle = (left_control_angle_deg + right_control_angle_deg) * 0.5f;
+        s_assist_ramp_active       = false;
+        s_prev_base_active         = false;
         s_assist_session_active = true;
         XM_SendUsbDebugMessage("[SQUAT] session started\r\n");
     }
@@ -580,6 +763,16 @@ void User_Loop(void)
      * [에러] BTN1 CLICK이 FSR 캘과 EMG 캘에 동시에 반응함 → 각 함수에서 직접
      *        XM_GetButtonEvent를 호출하고 있는 것. ev 구조체를 통해서만 전달해야 함. */
     ev = _ReadButtons();
+
+    /* ── 버튼 → EMG cal request 변환 ────────────────────────────────────────
+     * _ReadButtons() 가 매 루프 XM_GetButtonEvent() 로 이벤트를 소비하므로,
+     * ev 를 어디서도 사용하지 않으면 버튼 입력이 그대로 버려진다.
+     * Live Expressions 의 emg_cal_*_request 변수를 1 로 세팅하면 _UpdateEmgCal()
+     * 이 동일한 캘 시퀀스를 시작하므로, 버튼 입력을 그 변수로 매핑해 둔다.
+     * → 버튼·디버거 둘 다로 캘 트리거 가능. */
+    if (ev.btn1 == XM_BTN_CLICK) { emg_cal_rest_request   = 1U; }
+    if (ev.btn2 == XM_BTN_CLICK) { emg_cal_effort_request = 1U; }
+    if (ev.btn3 == XM_BTN_CLICK) { emg_cal_reset_request  = 1U; }
 
     /* ── ASSIST 모드 제어 파이프라인 (실행 순서 절대 변경 금지) ──────────────
      *
@@ -1141,20 +1334,31 @@ static void _UpdateCompensation(void)
 }
 
 /* ============================================================================
- * SQUAT FSM
+ * SQUAT FSM  [v2]
  * ============================================================================
  *
- * Phase transitions (based on average left+right hip angle):
+ * Phase transitions (based on avg hip angle + dwell-based user intent):
  *
- *   STAND      -> DESCENDING : avg_angle >= squat_enter_threshold  (150 ms debounce)
- *   DESCENDING -> BOTTOM     : avg_angle >= squat_bottom_threshold
- *   DESCENDING -> RETURN     : avg_angle < squat_enter_threshold   (aborted rep)
- *   BOTTOM     -> ASCENDING  : avg_velocity < -0.05 rad/s          (reversing up)
+ *   STAND      -> DESCENDING : avg_angle >= squat_enter_threshold   (150 ms debounce)
+ *   DESCENDING -> BOTTOM     : intent == HOLD  &&  avg_angle >= squat_enter
+ *                              (dwell-time 기반, 각도 임계값 미사용 — 사용자가
+ *                               의도적으로 정지할 때만 BOTTOM 인정)
+ *   DESCENDING -> RETURN     : avg_angle < squat_enter_threshold    (aborted rep)
+ *   BOTTOM     -> ASCENDING  : intent == ASCEND  ||  avg_emg >= emg_ascend_threshold
+ *                              (각속도 미분 사용 안 함, dwell 결과 + EMG push)
  *   ASCENDING  -> RETURN     : avg_angle < squat_enter_threshold
- *   RETURN     -> STAND      : avg_angle <= squat_stand_threshold   (150 ms debounce)
- *   RETURN     -> ASCENDING  : avg_angle >= squat_enter_threshold   (re-descend guard)
+ *   RETURN     -> STAND      : avg_angle <= squat_stand_threshold    (150 ms debounce)
+ *   (RETURN → ASCENDING 제거: 15° 근처 채터링 방지)
  *
- * Torque is applied during ASCENDING only.
+ * Base 토크 (룩업 기반):
+ *   ASCENDING        → lookup(angle) × ramp 적용
+ *   BOTTOM(HOLD)     → lookup(angle) × ramp 적용 (정지 보조)
+ *   BOTTOM(DESCEND)  → 0 (아직 내려가려는 의도 — 방해 안 함)
+ *   그 외 (STAND/DESC/RETURN) → 0
+ *
+ * Compensation 토크는 phase 무관하게 active 상태에서 항상 인가됨 (각도 sin 함수).
+ * 사용자 의도(USER_INTENT_DESCEND/HOLD/ASCEND)는 _UpdateUserIntent() 가 sliding
+ * window dwell-time 으로 판정. 헬퍼 섹션 참조.
  * ============================================================================ */
 
 static void _UpdateSquatFsm(void)
@@ -1169,7 +1373,7 @@ static void _UpdateSquatFsm(void)
     /* ── 스쿼트 FSM 입력 계산 ────────────────────────────────────────────────
      *
      * avg_angle: 좌우 고관절 평균 각도 (기립 0°, 스쿼트 시 양수 증가).
-     * avg_velocity: 각도 변화율 (하강 시 양수, 상승 복귀 시 음수).
+     * (v2): avg_velocity 는 계산만 하고 FSM 전이엔 사용 안 함. dwell intent 사용.
      *
      * [에러] avg_angle이 스쿼트해도 0 근처에서 변하지 않음:
      *   케이스 1: 두 엔코더 모두 freeze → CAN 문제.
@@ -1178,26 +1382,31 @@ static void _UpdateSquatFsm(void)
      *   진단 방법: left_control_angle_deg 와 right_control_angle_deg 를
      *              각각 Live Expressions에서 스쿼트하며 변화 확인.
      *
-     * [에러] avg_velocity가 항상 0:
-     *   → s_comp_prev_valid가 true가 된 후에도 각도 변화가 0인 것.
-     *     각도 자체가 freeze되어 있는 것. 엔코더 CAN 확인.
-     *
-     * [FSM 전환 조건 요약 — 문제 생기면 임계값 조정]:
+     * [FSM 전환 조건 요약 — 문제 생기면 임계값/dwell 파라미터 조정]:
      *   STAND→DESC  : avg_angle >= squat_enter_threshold (기본 15°) + 150ms 지속
-     *   DESC→BOTTOM : avg_angle >= squat_bottom_threshold (기본 45°)
+     *   DESC→BOTTOM : intent==HOLD && avg_angle>=enter_threshold  (각도 임계 없음)
      *   DESC→RETURN : avg_angle < squat_enter (조기 복귀)
-     *   BOTTOM→ASC  : avg_velocity < -0.05 rad/s (방향 반전 감지)
+     *   BOTTOM→ASC  : intent==ASCEND  ||  avg_emg >= emg_ascend_threshold
      *   ASC→RETURN  : avg_angle < squat_enter (거의 일어선 것)
      *   RETURN→STAND: avg_angle <= squat_stand_threshold (기본 5°) + 150ms
-     *   RETURN→ASC  : avg_angle >= squat_enter (중간에 다시 앉는 경우 대비)
+     *   (RETURN→ASC 제거: 15° 근처 채터링 방지)
      *
      * [에러] STAND→DESC 전환이 안 됨:
      *   → squat_enter_threshold(15°)가 너무 큼. 실제 시작 각도를 확인하고 낮출 것.
      *
+     * [에러] DESC→BOTTOM 전환이 안 됨 (사용자 정지해도 DESCENDING 유지):
+     *   → intent 가 HOLD 로 확정 안 됨. _UpdateUserIntent 의 윈도우 판정 확인.
+     *     (a) dwell_threshold_ms (기본 200) 가 너무 길어 윈도우 만료 전 다시 움직임.
+     *     (b) dwell_angle_dead_deg (기본 1.5°) 가 너무 좁아 미세 흔들림으로 탈락.
+     *     (c) 사용자가 실제로 계속 천천히 내려가고 있음 — 의도대로면 정상.
+     *
      * [에러] BOTTOM→ASC 전환이 안 됨 (상승 시작해도 BOTTOM 유지):
-     *   → avg_velocity가 -0.05 기준을 못 넘는 것. 두 경우:
-     *     (a) 각속도 노이즈로 -0.05 미만이 되지 않음 → 임계값을 -0.02로 완화.
-     *     (b) encoder_sign 때문에 실제 상승이 양수 속도로 보임 → sign 확인.
+     *   → intent 가 ASCEND 로 안 바뀜. 두 가지 확인:
+     *     (a) dwell_exit_angle_deg (기본 2.5°) 가 너무 큼 → 작은 상승을 못 잡음. 낮출 것.
+     *     (b) emg_ascend_threshold 를 활용해 EMG 강제 트리거 (기본 0.5, 0=비활성).
+     *
+     * [에러] BOTTOM→ASC 전환이 너무 빨리 일어남 (BOTTOM 머무르려 했는데 ASC로 튐):
+     *   → emg_ascend_threshold 가 너무 낮음. 0.7~1.0 으로 올리거나 0 으로 비활성화.
      *
      * [에러] ASC→RETURN 전환이 안 됨 (torque가 끝나지 않음):
      *   → 일어선 후에도 avg_angle이 enter_threshold(15°) 아래로 안 내려옴.
@@ -1206,10 +1415,15 @@ static void _UpdateSquatFsm(void)
     avg_angle    = (left_control_angle_deg      + right_control_angle_deg)      * 0.5f;
     avg_velocity = (left_angular_velocity_rads  + right_angular_velocity_rads)  * 0.5f;
     now          = XM_GetTick();
+    (void)avg_velocity;   /* [v2] BOTTOM→ASC 전환에 더 이상 사용 안 함 (intent 기반) */
+
+    /* [v2] 사용자 의도(Dwell-time) 갱신 — 이 결과를 FSM 전이에 사용 */
+    _UpdateUserIntent(avg_angle);
 
     enter_zone  = (avg_angle >= squat_enter_threshold_deg);
     bottom_zone = (avg_angle >= squat_bottom_threshold_deg);
     stand_zone  = (avg_angle <= squat_stand_threshold_deg);
+    (void)bottom_zone;    /* [v2] BOTTOM 진입은 intent 기반 (각도 임계 미사용) */
 
     switch (s_squat_phase) {
 
@@ -1228,7 +1442,13 @@ static void _UpdateSquatFsm(void)
         break;
 
     case SQUAT_DESCENDING:
-        if (bottom_zone) {
+        /* [v2] BOTTOM 진입을 각도 임계 대신 Dwell-time 기반으로 변경.
+         *   사용자가 의도적으로 정지(dwell)할 때만 BOTTOM 인정.
+         *   각도가 45° 넘어도 사용자가 더 내려가려는 의도면 DESCENDING 유지.
+         *   → 모터가 사용자 의도 방해 X.
+         *
+         * 안전 조건: 의도가 HOLD 로 확정되었고 어느 정도 깊이(enter_zone) 도달했을 때만. */
+        if ((s_user_intent == USER_INTENT_HOLD) && enter_zone) {
             s_squat_phase           = SQUAT_BOTTOM;
             s_squat_debounce_active = false;
         } else if (!enter_zone) {
@@ -1239,15 +1459,15 @@ static void _UpdateSquatFsm(void)
         break;
 
     case SQUAT_BOTTOM:
-        /* 상승 전환 조건 (둘 중 하나):
-         *   [1] 각속도 역전 (하강=+ 이므로 상승 시 음수)
-         *   [2] EMG 활성도가 emg_ascend_threshold 이상 (근육이 밀어 올리는 것 감지)
-         *       emg_ascend_threshold=0.0 으로 설정 시 EMG 조건 비활성화. */
+        /* [v2] BOTTOM → ASCENDING 전환을 Dwell intent 기반으로 변경.
+         *   사용자 의도가 ASCEND 로 바뀌면(각도 감소 EXIT_ANGLE 초과) 전환.
+         *   각속도 미분 안 씀 → 노이즈 영향 ↓.
+         *   기존 emg_ascend_threshold 조건은 보조로 유지(매우 강한 EMG 시 즉시 전환). */
         {
             float avg_emg = (s_emg_norm_priv[EMG_LH] + s_emg_norm_priv[EMG_RH]) * 0.5f;
-            bool emg_push = (emg_ascend_threshold > 0.0f) &&
-                            (avg_emg >= emg_ascend_threshold);
-            if (avg_velocity < -0.05f || emg_push) {
+            bool  emg_push = (emg_ascend_threshold > 0.0f) &&
+                             (avg_emg >= emg_ascend_threshold);
+            if (s_user_intent == USER_INTENT_ASCEND || emg_push) {
                 s_squat_phase = SQUAT_ASCENDING;
             }
         }
@@ -1261,6 +1481,11 @@ static void _UpdateSquatFsm(void)
         break;
 
     case SQUAT_RETURN:
+        /* [v2] RETURN → ASC 전이 제거.
+         *   기존: 15° 근처에서 각도 흔들리면 RETURN↔ASC 채터링 (4→3→4→3) 발생.
+         *   정책: RETURN 진입 후엔 무조건 STAND 만 갈 수 있음.
+         *   사용자가 다 일어서기 전에 다시 squat 시작하면 한 번 완전히 일어선 뒤
+         *   다시 앉으면 됨 (실험 상 거의 발생 안 하는 시나리오). */
         if (stand_zone) {
             if (!s_squat_debounce_active) {
                 s_squat_debounce_active = true;
@@ -1270,13 +1495,7 @@ static void _UpdateSquatFsm(void)
                 s_squat_debounce_active = false;
             }
         } else {
-            /* Re-descent before fully standing -> back to ascending */
-            if (enter_zone) {
-                s_squat_phase           = SQUAT_ASCENDING;
-                s_squat_debounce_active = false;
-            } else {
-                s_squat_debounce_active = false;
-            }
+            s_squat_debounce_active = false;
         }
         break;
 
@@ -1312,11 +1531,12 @@ static void _ApplyTorque(void)
      *   step2: squat_control_ON 확인 → 0이면 Live Expressions에서 1로 설정.
      *
      * [에러] assist_enable = 1 인데 토크가 전혀 안 느껴짐:
-     *   케이스 1: squat_phase ≠ ASCENDING(3) → EMG base 토크는 ASCENDING만.
-     *     compensation_ON=1 이라면 보상 토크는 모든 active 상태에서 나옴.
-     *   케이스 2: squat_max_torque_nm = 0.3 너무 작음. 느껴지지 않을 수 있음.
-     *   케이스 3: emg_rh_norm / emg_lh_norm = 0 → EMG 캘 안 됐거나 수축 안 함.
+     *   케이스 1: squat_phase 가 ASCENDING(3) 도 BOTTOM(2, HOLD intent) 도 아님
+     *     → base 토크 0. compensation_ON=1 이면 보상 토크는 모든 active phase 에서 나옴.
+     *   케이스 2: squat_max_torque_nm 이 0 으로 설정 → 룩업 비활성화. 6.0 이 기본.
+     *   케이스 3: assist_ramp_time_ms 가 매우 큼 + ASCEND 가 빠름 → ramp 0~50% 만 도달.
      *   케이스 4: torque_sign 부호 반전으로 기계 저항으로 작용 (H10 임피던스 모드).
+     *   케이스 5: assist_torque_limit_nm 가 너무 낮음 → clamp 후 출력 작음.
      *
      * [에러] 안전 게이트 통과했는데 XM_SetAssistTorqueLH 가 실제 모터 출력 안 됨:
      *   → XM_SetControlMode(XM_CTRL_TORQUE) 가 설정됐는지 확인.
@@ -1335,8 +1555,14 @@ static void _ApplyTorque(void)
         right_assist_torque_nm      = 0.0f;
         left_compensation_torque_nm = 0.0f;
         right_compensation_torque_nm = 0.0f;
-        s_torque_lh_ramp            = 0.0f;
-        s_torque_rh_ramp            = 0.0f;
+        /* [v2] dwell/intent/ramp 상태 리셋 — 재진입 시 깨끗한 상태로 시작 */
+        s_user_intent               = USER_INTENT_DESCEND;
+        s_dwell_window_start_tick   = XM_GetTick();
+        s_dwell_window_start_angle  = (left_control_angle_deg + right_control_angle_deg) * 0.5f;
+        s_assist_ramp_active        = false;
+        s_prev_base_active          = false;
+        s_torque_lh_out             = 0.0f;
+        s_torque_rh_out             = 0.0f;
         XM_SetAssistTorqueLH(0.0f);
         XM_SetAssistTorqueRH(0.0f);
         if (s_torque_mode_active) {
@@ -1359,37 +1585,59 @@ static void _ApplyTorque(void)
     }
     assist_enable = 1U;
 
-    /* ── 보조 토크 계산 ──────────────────────────────────────────────────────
+    /* ── [v2] 보조 토크 계산 — 사용자 룩업 + 500ms Ramp ────────────────────
      *
-     * DESCENDING : EMG 비례 (emg_norm × squat_max_torque_nm)
-     *   → 근육이 버티는 힘에 비례해 보조. EMG 캘 필요.
-     *   → 캘 전에는 norm이 작아 토크도 작음 (안전).
+     * 핵심 변경:
+     *   - DESCENDING: base = 0 (EMG 비례 제거).
+     *     이유: MaxTorque0 분석에서 DESC EMG 매우 낮음(평균 0.24V),
+     *          compensation 만으로 사용자 부담 이미 충분히 받침.
+     *          EMG 비례 토크는 노이즈/지연으로 사용자 동시수축 유발.
      *
-     * ASCENDING  : squat_max_torque_nm 직접 적용 (고정 최대)
-     *   → 일어나는 구간은 시간이 짧아 EMG 비례로는 충분한 토크를 내기 어려움.
+     *   - BOTTOM(HOLD intent): base = lookup(angle) × ramp.
+     *     Dwell-time 으로 사용자 의도가 HOLD 로 확정된 후 500ms ramp 으로 적용.
+     *     사용자가 아직 내려가려는 의도(DESCEND)면 base = 0.
      *
-     * BOTTOM/STAND/RETURN : base = 0 (보상 토크만 출력)
+     *   - ASCENDING: base = lookup(angle) × ramp.
+     *     사용자 baseline EMG 프로파일 기반. sticking point(~15-25°)에서 자동 최대.
+     *     compensation 몫은 룩업이 미리 차감해 둠.
      *
-     * [중요] squat_max_torque_nm 초기값 0.5 Nm — 방향 확인 후 2.5 Nm 까지 올릴 것.
+     * 룩업 값 (Nm) = max(0, EMG_baseline(θ) × scale - compensation(θ))
+     *   compensation = 0.5 × 8 × sin(θ) 가정. gravity_mgl_nm/compensation_scale
+     *   변경 시 룩업 테이블 재계산 필요.
      *
-     * [에러] DESCENDING 토크가 0:
-     *   케이스 1: emg_rh_norm = emg_lh_norm = 0 → EMG 캘 미수행 또는 수축 없음.
-     *   케이스 2: squat_max_torque_nm = 0.
-     *
-     * [에러] ASCENDING 토크가 0:
-     *   케이스 1: squat_max_torque_nm = 0.
-     *   케이스 2: s_squat_phase 가 ASCENDING(3) 이 아님 → squat_phase 확인.
-     *
-     * [에러] 토크가 저항으로 느껴짐 → torque_sign = -1.0 으로 수정. */
-    if (s_squat_phase == SQUAT_DESCENDING) {
-        base_lh = s_emg_norm_priv[EMG_LH] * squat_max_torque_nm;
-        base_rh = s_emg_norm_priv[EMG_RH] * squat_max_torque_nm;
-    } else if (s_squat_phase == SQUAT_ASCENDING) {
-        base_lh = squat_max_torque_nm;
-        base_rh = squat_max_torque_nm;
-    } else {
-        base_lh = 0.0f;
-        base_rh = 0.0f;
+     * Ramp 동작: base 가 0→양수로 바뀌는 순간 assist_ramp_time_ms 동안 선형 증가.
+     *   기본 500ms (Reinkensmeyer 2009 인간 응답 지연 매치).
+     *   ASCEND 가 1초로 짧을 땐 200~300ms 로 낮춰서 sticking point 에 토크 도달 보장. */
+    {
+        float avg_angle_deg = (left_control_angle_deg + right_control_angle_deg) * 0.5f;
+        float target_base;
+        float ramp_mul;
+        bool  base_active;
+
+        if (s_squat_phase == SQUAT_ASCENDING) {
+            target_base = _LookupUserAscend(avg_angle_deg);
+        } else if (s_squat_phase == SQUAT_BOTTOM) {
+            if (s_user_intent == USER_INTENT_HOLD) {
+                target_base = _LookupUserAscend(avg_angle_deg);
+            } else {
+                /* 아직 내려가려는 의도 → 방해 안 함 */
+                target_base = 0.0f;
+            }
+        } else {
+            /* DESCENDING / STAND / RETURN: lookup base 0 (compensation 만) */
+            target_base = 0.0f;
+        }
+
+        /* squat_max_torque_nm 을 전역 게인으로 활용 (Live Expr 튜닝).
+         * 6.0 (=룩업 설계 기준값) → 룩업 값 그대로 출력.
+         * 3.0 → 절반, 0.0 → lookup 비활성 (compensation 만). */
+        target_base *= (squat_max_torque_nm / 6.0f);  /* 6.0 = 룩업 설계 기준값 */
+
+        base_active = (target_base > 0.05f);
+        ramp_mul    = _ComputeAssistRamp(base_active);
+
+        base_lh = target_base * ramp_mul;
+        base_rh = target_base * ramp_mul;
     }
 
     left_assist_torque_nm = _ClampFloat(
@@ -1402,13 +1650,15 @@ static void _ApplyTorque(void)
     /* ── 최종 토크 clamp 및 부호 적용 ──────────────────────────────────────
      * left/right_assist_torque_nm = clamp(base + comp, -limit, +limit)
      *
-     * [에러] 토크가 limit(기본 0.5 Nm)으로 고정:
+     * [에러] 토크가 limit(기본 10.0 Nm, hard cap 10.0)으로 고정:
      *   → 입력 합계가 limit을 초과. squat_max_torque_nm 또는 gravity_mgl_nm 낮출 것.
+     *   → 기본값에선 발생 안 함 (peak ~5 Nm vs limit 10 Nm). 사용자가 limit 낮추면 가능.
      *
      * [에러] 토크 방향 반대 (저항으로 느껴짐):
      *   케이스 1: torque_sign = -1.0 으로 Live Expressions 수정.
      *   케이스 2: compensation 토크 방향 문제 → compensation_ON=0 해서 base 토크만 확인.
-     *   케이스 3: 두 케이스를 구분: ASCENDING에서 squat_max_torque_nm만 켠 상태로 확인.
+     *   케이스 3: ASCENDING phase 에서 compensation_ON=0 + squat_max_torque_nm 만 켠 상태로
+     *             base/comp 어느 쪽이 문제인지 격리해서 확인.
      *
      * [중요] torque_sign은 left/right 동시에 적용됨.
      *   좌우가 각각 반대 방향이면 (비대칭 장착) torque_sign으로는 해결 안 됨.
@@ -1417,19 +1667,30 @@ static void _ApplyTorque(void)
      * [에러] XM_SetAssistTorqueLH 호출 후 실제 모터에서 응답 없음:
      *   → s_torque_mode_active=true + XM_CTRL_TORQUE 상태 확인.
      *   → H10 통신 상태 확인 (CAN 연결). */
-    /* ── 토크 출력 ramp 스무딩 (phase 전환 시 급격한 토크 변화 방지) ──────────
-     * TORQUE_RAMP_HZ(5Hz) = 시정수 ~200ms.
-     * phase가 바뀌어도 토크가 부드럽게 목표값으로 수렴.
-     * [에러] 안전 게이트 꺼질 때 ramp가 천천히 0으로 내려와야 함:
-     *   → assist_requested=false 경로에서 s_torque_*_ramp 를 0으로 즉시 초기화. */
-    s_torque_lh_ramp = _LowPassUpdate(s_torque_lh_ramp,
-                                      torque_sign * left_assist_torque_nm,
-                                      TORQUE_RAMP_HZ);
-    s_torque_rh_ramp = _LowPassUpdate(s_torque_rh_ramp,
-                                      torque_sign * right_assist_torque_nm,
-                                      TORQUE_RAMP_HZ);
-    XM_SetAssistTorqueLH(s_torque_lh_ramp);
-    XM_SetAssistTorqueRH(s_torque_rh_ramp);
+    /* ── 토크 출력 (slew-rate limit) ────────────────────────────────────────
+     * Phase 전이 시 base 토크가 즉시 0이 되며 발생하는 step 차단.
+     * 직전 출력값에서 ±torque_slew_nm_per_ms 이내로만 변화 허용.
+     * → 모터 di/dt 스파이크 차단 → 과전류 보호 트립 방지.
+     * Ramp-up 은 _ComputeAssistRamp() 가, ramp-down 은 이 slew 가 담당. */
+    {
+        float target_lh = torque_sign * left_assist_torque_nm;
+        float target_rh = torque_sign * right_assist_torque_nm;
+        float slew      = torque_slew_nm_per_ms;
+        if (slew < 0.001f) slew = 0.001f;    /* 안전 하한 (너무 작으면 stuck) */
+
+        float delta_lh = target_lh - s_torque_lh_out;
+        if (delta_lh >  slew) delta_lh =  slew;
+        if (delta_lh < -slew) delta_lh = -slew;
+        s_torque_lh_out += delta_lh;
+
+        float delta_rh = target_rh - s_torque_rh_out;
+        if (delta_rh >  slew) delta_rh =  slew;
+        if (delta_rh < -slew) delta_rh = -slew;
+        s_torque_rh_out += delta_rh;
+
+        XM_SetAssistTorqueLH(s_torque_lh_out);
+        XM_SetAssistTorqueRH(s_torque_rh_out);
+    }
 }
 
 /* ============================================================================
@@ -1467,6 +1728,7 @@ static void _UpdatePublicSignals(void)
     /* System */
     assist_mode_active = (XM.status.h10.h10Mode == XM_H10_MODE_ASSIST) ? 1U : 0U;
     squat_phase        = (uint16_t)s_squat_phase;
+    user_intent        = (uint16_t)s_user_intent;
 }
 
 static void _SendStream(void)
@@ -1558,4 +1820,159 @@ static float _SignFloat(float x)
     if (x > 0.0f) { return  1.0f; }
     if (x < 0.0f) { return -1.0f; }
     return 0.0f;
+}
+
+/* ============================================================================
+ * [v2] USER LOOKUP / DWELL / RAMP HELPERS
+ * ============================================================================ */
+
+/* 사용자 ASCEND 룩업 — 각도(deg)에 대해 추가 토크(Nm) 반환.
+ * 5°~70° 14점 룩업, 선형 보간. 범위 밖은 끝값으로 고정 + 양 끝 페이드.
+ * 영점 ±5° 어긋남 흡수용으로 5° 미만 / 65° 초과 영역에서 점진 페이드 적용. */
+static float _LookupUserAscend(float angle_deg)
+{
+    float idx_f;
+    int   idx_low;
+    float frac;
+    float v;
+
+    if (angle_deg <= USER_LOOKUP_BASE_DEG) {
+        /* 5° 미만: 0° → 0 으로 페이드 인 */
+        if (angle_deg <= 0.0f) { return 0.0f; }
+        return s_user_lookup_ascend[0] * (angle_deg / USER_LOOKUP_BASE_DEG);
+    }
+
+    idx_f   = (angle_deg - USER_LOOKUP_BASE_DEG) / USER_LOOKUP_STEP_DEG;
+    idx_low = (int)idx_f;
+
+    if (idx_low >= (USER_LOOKUP_ASCEND_POINTS - 1)) {
+        /* 70° 초과: 끝값 유지 (이미 0인 구간) */
+        return s_user_lookup_ascend[USER_LOOKUP_ASCEND_POINTS - 1];
+    }
+
+    frac = idx_f - (float)idx_low;
+    v = s_user_lookup_ascend[idx_low] * (1.0f - frac) +
+        s_user_lookup_ascend[idx_low + 1] * frac;
+
+    if (v < 0.0f) { v = 0.0f; }
+    return v;
+}
+
+/* Windowed Dwell-time 기반 사용자 의도 갱신.
+ * 호출 주기: 1ms (User_Loop ISR).
+ *
+ * 알고리즘 (sliding window 단순 구현):
+ *   - 매 dwell_threshold_ms 마다 윈도우 종료 시점에 angle 변화량 측정.
+ *   - 윈도우 시작↔현재 변화량 |Δ| < ANGLE_DEAD → HOLD 확정.
+ *   - HOLD 중에는 EXIT 임계로 탈출 검사 (히스테리시스).
+ *   - 윈도우 끝마다 시작 각도/시점 재설정.
+ *
+ * 이유: 단순 "ref 갱신" 방식은 천천히 내려가는 사용자(< DEAD/THRESHOLD 속도)에서
+ *       false HOLD 발생. 윈도우 방식은 전체 윈도우 동안 누적 변화를 보므로
+ *       속도와 무관하게 정확히 "지난 N ms 동안 멈춰있었는가" 판정.
+ *
+ * 검출 지연: 최대 ~THRESHOLD_MS×2 (worst case). 200ms 설정 시 ~400ms.
+ *           인간 응답 지연(500ms)보다 짧음 → 사용자 체감 문제 없음.
+ *
+ * 안전: 각속도 미분 안 씀 → 노이즈 강건성 ↑ */
+static void _UpdateUserIntent(float avg_angle)
+{
+    uint32_t now;
+    uint32_t window_elapsed;
+    float    window_change;
+    float    abs_change;
+
+    /* Squat phase 가 STAND/RETURN 이면 의도 추적 의미 없음 — 리셋 */
+    if (s_squat_phase == SQUAT_STAND || s_squat_phase == SQUAT_RETURN) {
+        s_user_intent              = USER_INTENT_DESCEND;  /* 다음 진입 대비 기본값 */
+        s_dwell_window_start_tick  = XM_GetTick();
+        s_dwell_window_start_angle = avg_angle;
+        return;
+    }
+
+    now            = XM_GetTick();
+    window_elapsed = now - s_dwell_window_start_tick;
+
+    /* 윈도우 진행 중 — 아직 평가 안 함 (단, HOLD 탈출은 즉시 감지) */
+    if (s_user_intent == USER_INTENT_HOLD) {
+        /* HOLD 중에는 윈도우 무관하게 큰 움직임 즉시 감지 (히스테리시스) */
+        window_change = avg_angle - s_dwell_window_start_angle;
+        abs_change    = _AbsFloat(window_change);
+        if (abs_change > dwell_exit_angle_deg) {
+            if (window_change > 0.0f) {
+                s_user_intent = USER_INTENT_DESCEND;
+            } else {
+                s_user_intent = USER_INTENT_ASCEND;
+            }
+            s_dwell_window_start_tick  = now;
+            s_dwell_window_start_angle = avg_angle;
+        }
+        return;
+    }
+
+    /* DESCEND/ASCEND 상태 — 윈도우 만료까지 대기 */
+    if (window_elapsed < (uint32_t)dwell_threshold_ms) {
+        return;
+    }
+
+    /* 윈도우 만료 — 누적 변화량 평가 */
+    window_change = avg_angle - s_dwell_window_start_angle;
+    abs_change    = _AbsFloat(window_change);
+
+    if (abs_change < dwell_angle_dead_deg) {
+        /* 윈도우 동안 거의 안 움직였음 → HOLD 확정 */
+        s_user_intent = USER_INTENT_HOLD;
+    } else if (window_change > 0.0f) {
+        /* 윈도우 동안 의미 있게 더 내려감 */
+        s_user_intent = USER_INTENT_DESCEND;
+    } else {
+        /* 윈도우 동안 의미 있게 올라감 */
+        s_user_intent = USER_INTENT_ASCEND;
+    }
+
+    /* 다음 윈도우 시작 */
+    s_dwell_window_start_tick  = now;
+    s_dwell_window_start_angle = avg_angle;
+}
+
+/* 보조 토크 ramp-in (0 → 1) 계산.
+ * base_active 가 false → true 로 바뀌는 순간 ramp 시작.
+ * 500ms 동안 0 → 1 선형 증가, 이후 1 유지.
+ * base_active=false 면 즉시 0 반환 (ramp 리셋).
+ *
+ * 인간 응답 지연(~500ms)에 맞춰 사용자가 부담 없이 토크에 적응할 시간 부여. */
+static float _ComputeAssistRamp(bool base_active)
+{
+    uint32_t now;
+    uint32_t elapsed;
+    float    mul;
+
+    if (!base_active) {
+        s_assist_ramp_active = false;
+        s_prev_base_active   = false;
+        return 0.0f;
+    }
+
+    /* base_active = true */
+    if (!s_prev_base_active) {
+        /* edge: 0 → 1 — ramp 시작 */
+        s_assist_ramp_tick   = XM_GetTick();
+        s_assist_ramp_active = true;
+    }
+    s_prev_base_active = true;
+
+    if (!s_assist_ramp_active) { return 1.0f; }
+
+    now     = XM_GetTick();
+    elapsed = now - s_assist_ramp_tick;
+    /* assist_ramp_time_ms 가 0 이면 ramp 비활성 (즉시 1.0). 하한 1ms 로 안전 보장. */
+    {
+        uint32_t ramp_ms = (assist_ramp_time_ms == 0U) ? 1U : (uint32_t)assist_ramp_time_ms;
+        if (elapsed >= ramp_ms) {
+            s_assist_ramp_active = false;
+            return 1.0f;
+        }
+        mul = (float)elapsed / (float)ramp_ms;
+    }
+    return mul;
 }
