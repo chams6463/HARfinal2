@@ -1,0 +1,169 @@
+{
+  "status": "same_wearer_same_session_test_tail_synthetic_splice_proxy",
+  "runtime_reset_count": 0,
+  "output_period_ms": 50,
+  "causal_history_ms": 320,
+  "first_valid_result_after_splice_ms": 350,
+  "state": {
+    "valid_50ms_ticks": 882,
+    "accuracy": 0.9943310657596371,
+    "macro_f1": 0.983337587598573,
+    "labels": [
+      "stand",
+      "walk",
+      "jump",
+      "sit"
+    ],
+    "confusion_matrix": [
+      [
+        373,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        296,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        175,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        33
+      ]
+    ],
+    "per_state": {
+      "stand": {
+        "precision": 0.9946666666666667,
+        "recall": 0.9920212765957447,
+        "f1": 0.9933422103861518,
+        "support": 376
+      },
+      "walk": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 296
+      },
+      "jump": {
+        "precision": 0.9943181818181818,
+        "recall": 1.0,
+        "f1": 0.9971509971509972,
+        "support": 175
+      },
+      "sit": {
+        "precision": 0.9428571428571428,
+        "recall": 0.9428571428571428,
+        "f1": 0.9428571428571428,
+        "support": 35
+      }
+    }
+  },
+  "jump_events": {
+    "truth_events": 12,
+    "predicted_events": 12,
+    "matched_events": 12,
+    "false_events": 0,
+    "missed_events": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "latency_ms_median_vs_takeoff_force_peak": -76.0,
+    "latency_ms_p95_vs_takeoff_force_peak": -15.650000000000002,
+    "nonjump_false_events": 0,
+    "matching_window_ms": [
+      -400,
+      150
+    ],
+    "matches": [
+      {
+        "prediction_ms": 6900,
+        "truth_force_peak_ms": 6985,
+        "latency_ms": -85
+      },
+      {
+        "prediction_ms": 7850,
+        "truth_force_peak_ms": 7955,
+        "latency_ms": -105
+      },
+      {
+        "prediction_ms": 8950,
+        "truth_force_peak_ms": 8970,
+        "latency_ms": -20
+      },
+      {
+        "prediction_ms": 9900,
+        "truth_force_peak_ms": 9914,
+        "latency_ms": -14
+      },
+      {
+        "prediction_ms": 17350,
+        "truth_force_peak_ms": 17515,
+        "latency_ms": -165
+      },
+      {
+        "prediction_ms": 18800,
+        "truth_force_peak_ms": 18817,
+        "latency_ms": -17
+      },
+      {
+        "prediction_ms": 20200,
+        "truth_force_peak_ms": 20404,
+        "latency_ms": -204
+      },
+      {
+        "prediction_ms": 21650,
+        "truth_force_peak_ms": 21810,
+        "latency_ms": -160
+      },
+      {
+        "prediction_ms": 36600,
+        "truth_force_peak_ms": 36665,
+        "latency_ms": -65
+      },
+      {
+        "prediction_ms": 38350,
+        "truth_force_peak_ms": 38433,
+        "latency_ms": -83
+      },
+      {
+        "prediction_ms": 40150,
+        "truth_force_peak_ms": 40216,
+        "latency_ms": -66
+      },
+      {
+        "prediction_ms": 41900,
+        "truth_force_peak_ms": 41969,
+        "latency_ms": -69
+      }
+    ]
+  },
+  "full_crouch": {
+    "true_ticks": 35,
+    "predicted_ticks": 35,
+    "precision": 0.9428571428571428,
+    "recall": 0.9428571428571428,
+    "false_positive_ticks": 2,
+    "false_negative_ticks": 2,
+    "truth_plateau_events": 2,
+    "detected_plateau_events": 2,
+    "missed_plateau_events": 0,
+    "false_plateau_events": 0,
+    "plateau_event_recall": 1.0,
+    "non_sit_source_false_positive_ticks": 0
+  },
+  "limits": [
+    "동작별 원본의 시험용 뒤쪽 블록을 이어 붙인 혼합 프록시다.",
+    "원본 사이 splice와 그 뒤 320 ms는 state 지표에서 제외했다.",
+    "점프 시점 정답은 저중력 비행 직전 acc_norm 힘 피크 자동 프록시다.",
+    "새로운 자유 전환 실측 로그와 다른 착용일 일반화는 검증하지 않았다."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "status": "offline_mixed_prediction_to_game_output_pass",
+  "source": "mixed_50ms_predictions.csv",
+  "output_period_ms": 50,
+  "ticks": 1095,
+  "predicted_jump_events": 12,
+  "space_presses": 12,
+  "shift_downs_before_close": 2,
+  "shift_ups_before_close": 2,
+  "same_tick_shift_down_up_pulses": 0,
+  "false_crouch_ticks_with_shift_held": 0,
+  "held_keys_before_close": [],
+  "held_keys_after_close": [],
+  "test_double": {
+    "direct_input": "event-recording fake backend",
+    "rcon": "connected fake backend"
+  },
+  "limit": "This validates the Python prediction-to-key state machine offline; it is not a real Windows USB CDC or Minecraft screen test."
+}

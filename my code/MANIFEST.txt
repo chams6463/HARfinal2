@@ -1,0 +1,197 @@
+my code/ 파일 출처 (consolidate.py 자동생성)
+원본 5개 작업 사본에서 본인 작성 코드만 주제별로 통합한 것
+
+host_tools\cdc\bilateral_gait_event_monitor_plan.md
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\bilateral_gait_event_monitor_plan.md  (8,300 B)
+host_tools\cdc\cdc.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc.py  (46,690 B)
+host_tools\cdc\cdc_4ch_live_monitor.md
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_4ch_live_monitor.md  (4,064 B)
+host_tools\cdc\cdc_4ch_live_monitor.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_4ch_live_monitor.py  (17,761 B)
+host_tools\cdc\cdc_8ch_live_monitor.py
+    <- D:\HARfinal2\HARfinal\PythonDecoder\CDC\cdc_8ch_live_monitor.py  (23,169 B)
+host_tools\cdc\cdc_bilateral_gait_event_monitor.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_bilateral_gait_event_monitor.py  (47,064 B)
+host_tools\cdc\cdc_bilateral_gait_event_monitor_stairs.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_bilateral_gait_event_monitor_stairs.py  (50,593 B)
+host_tools\cdc\cdc_bilateral_gait_event_offline.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_bilateral_gait_event_offline.py  (12,338 B)
+host_tools\cdc\cdc_csv_reviewer.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_csv_reviewer.py  (19,211 B)
+host_tools\cdc\cdc_emg_torque_monitor.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_emg_torque_monitor.py  (22,747 B)
+host_tools\cdc\cdc_h10_live_monitor_verified.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\cdc_h10_live_monitor_verified.py  (27,840 B)
+host_tools\cdc\cdc_phai_receiver.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_phai_receiver.py  (46,436 B)
+host_tools\cdc\cdc_selective_logger.md
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_selective_logger.md  (2,689 B)
+host_tools\cdc\cdc_selective_logger.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_selective_logger.py  (28,514 B)
+host_tools\legacy\cdc_serial_data_logging.py
+    <- D:\ifac_wearable_contest\PythonDecoder\Legacy\cdc_serial_data_logging.py  (6,587 B)
+host_tools\msc\data_decoder_xm10.py
+    <- D:\ifac_wearable_contest\PythonDecoder\MSC\data_decoder_xm10.py  (11,111 B)
+host_tools\msc\data_decoder_xm10_v2.py
+    <- D:\ifac_wearable_contest\PythonDecoder\MSC\data_decoder_xm10_v2.py  (19,856 B)
+host_tools\viz\analyze_phase_glitch.py
+    <- D:\HARfinal2\HARfinal\PythonDecoder\analyze_phase_glitch.py  (2,880 B)
+host_tools\viz\geminiver.py
+    <- D:\HARfinal\PythonDecoder\geminiver.py  (4,272 B)
+host_tools\viz\merge_3plots.py
+    <- D:\HARfinal\PythonDecoder\merge_3plots.py  (3,706 B)
+host_tools\viz\user_algorithm_visualizer.py
+    <- D:\HARfinal\PythonDecoder\user_algorithm_visualizer.py  (37,501 B)
+host_tools\viz\xm10_system_visualizer.py
+    <- D:\HARfinal\PythonDecoder\xm10_system_visualizer.py  (27,909 B)
+minecraft_emg\bridge\GAME_OUTPUT_SPEC.md
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\GAME_OUTPUT_SPEC.md  (13,787 B)
+minecraft_emg\bridge\cdc_minecraft_bridge.py
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\cdc_minecraft_bridge.py  (26,308 B)
+minecraft_emg\bridge\mc_tuning.json
+    <- D:\ifac_wearable_contest\PythonDecoder\CDC\mc_tuning.json  (1,539 B)
+minecraft_emg\firmware\Final_EMG_minecraft.c
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\XM_Apps\User_Algorithm\Final_EMG.c  (29,538 B)
+minecraft_emg\firmware\minecraft_motion_config.h
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\XM_Apps\User_Algorithm\minecraft_motion_config.h  (3,589 B)
+minecraft_emg\firmware\minecraft_training_config.h
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\XM_Apps\User_Algorithm\minecraft_training_config.h  (1,113 B)
+minecraft_emg\firmware\minecraft_training_schema.h
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\XM_Apps\User_Algorithm\minecraft_training_schema.h  (2,270 B)
+minecraft_emg\motion_classifier\README_WINDOWS_KO.txt
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\README_WINDOWS_KO.txt  (3,270 B)
+minecraft_emg\motion_classifier\TRAINING_README_KO.txt
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\TRAINING_README_KO.txt  (4,014 B)
+minecraft_emg\motion_classifier\audit\game_output_integration.json
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\audit\game_output_integration.json  (664 B)
+minecraft_emg\motion_classifier\audit\locked_evaluation.json
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\audit\locked_evaluation.json  (158,327 B)
+minecraft_emg\motion_classifier\audit\mixed_evaluation.json
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\audit\mixed_evaluation.json  (3,869 B)
+minecraft_emg\motion_classifier\h10_evaluate_mixed_motion.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_evaluate_mixed_motion.py  (20,165 B)
+minecraft_emg\motion_classifier\h10_live_motion_classifier.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_live_motion_classifier.py  (25,906 B)
+minecraft_emg\motion_classifier\h10_motion_segment_model.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_motion_segment_model.py  (18,746 B)
+minecraft_emg\motion_classifier\h10_stream_motion_model.json
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_stream_motion_model.json  (26,285,812 B)
+minecraft_emg\motion_classifier\h10_stream_motion_model.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_stream_motion_model.py  (44,104 B)
+minecraft_emg\motion_classifier\h10_train_continuous_motion_classifier.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\h10_train_continuous_motion_classifier.py  (49,484 B)
+minecraft_emg\motion_classifier\mc_game_output.py
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\mc_game_output.py  (34,533 B)
+minecraft_emg\motion_classifier\mc_tuning.json
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\mc_tuning.json  (695 B)
+minecraft_emg\motion_classifier\requirements_h10_motion_classifier.txt
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\PythonDecoder\CDC\h10_minecraft_python_20260826_01a03742\requirements_h10_motion_classifier.txt  (137 B)
+modified_sdk_examples\Final_EMG_H10_12ch_verified.c
+    <- D:\Extension_Module-ghlee_03\Extension_Module-ghlee_03\XM_Apps\User_Algorithm\Final_EMG_H10_12ch_verified.c  (32,970 B)
+modified_sdk_examples\Final_FSR_Fuzzy_Logic_extended.c
+    <- D:\HARfinal\XM_Apps\User_Algorithm\Final_FSR_Fuzzy_Logic.c  (45,959 B)
+modified_sdk_examples\TA_Body_Parameter_ID.c
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\TA_Body_Parameter_ID.c  (14,331 B)
+modified_sdk_examples\final_user_app.c
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\final_user_app.c  (43,895 B)
+modified_sdk_examples\user_app_modified.c
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\user_app.c  (44,100 B)
+squat_assist\docs\Squat_EMG_Assist_functions.md
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\Code_guide\Squat_EMG_Assist_functions.md  (5,732 B)
+squat_assist\docs\Squat_FSR_Assist_Report.md
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\Squat_FSR_Assist_Report.md  (8,831 B)
+squat_assist\docs\live_expression_sqemg.txt
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\live_expression_sqemg.txt  (776 B)
+squat_assist\firmware\Squat_EMG_Assist.c
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\Squat_EMG_Assist.c  (78,132 B)
+squat_assist\firmware\Squat_EMG_Assist2.c
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\Squat_EMG_Assist2.c  (100,817 B)
+squat_assist\firmware\Squat_FSR_Assist.c
+    <- D:\HARfinal2\HARfinal\XM_Apps\User_Algorithm\Squat_FSR_Assist.c  (85,706 B)
+squat_assist\sim\sim_squat_v2.py
+    <- D:\HARfinal\PythonDecoder\sim_squat_v2.py  (11,300 B)
+squat_assist\sim\sim_squat_v2_5versions.py
+    <- D:\HARfinal\PythonDecoder\sim_squat_v2_5versions.py  (10,736 B)
+squat_assist\sim\squat_arch_viz.py
+    <- D:\HARfinal\PythonDecoder\squat_arch_viz.py  (31,401 B)
+squat_assist\sim\squat_arch_viz2.py
+    <- D:\HARfinal\PythonDecoder\squat_arch_viz2.py  (34,429 B)
+squat_assist\sim\squat_emg_viz.py
+    <- D:\HARfinal\PythonDecoder\squat_emg_viz.py  (25,244 B)
+squat_assist\sim\squat_fsm_debug_viz.py
+    <- D:\HARfinal\PythonDecoder\squat_fsm_debug_viz.py  (12,949 B)
+squat_assist\sim\test_squat_fsm.py
+    <- D:\HARfinal\PythonDecoder\test_squat_fsm.py  (26,376 B)
+terrain_classifier\analysis\matlab\build_h_d_reference_curves.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\build_h_d_reference_curves.m  (21,309 B)
+terrain_classifier\analysis\matlab\build_reference_bank_clean.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\build_reference_bank_clean.m  (15,929 B)
+terrain_classifier\analysis\matlab\diag_stand_curves.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\diag_stand_curves.m  (7,984 B)
+terrain_classifier\analysis\matlab\diag_stand_curves2.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\diag_stand_curves2.m  (5,466 B)
+terrain_classifier\analysis\matlab\export_ref_curve_tables.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\export_ref_curve_tables.m  (17,384 B)
+terrain_classifier\analysis\matlab\export_ref_curve_tables_clean.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\export_ref_curve_tables_clean.m  (17,723 B)
+terrain_classifier\analysis\matlab\extract_all12_subjects.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\extract_all12_subjects.m  (18,729 B)
+terrain_classifier\analysis\matlab\extract_all_subjects.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\extract_all_subjects.m  (17,463 B)
+terrain_classifier\analysis\matlab\extract_transition_features.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\extract_transition_features.m  (8,092 B)
+terrain_classifier\analysis\matlab\plot_h_d_reference_curves.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\plot_h_d_reference_curves.m  (4,704 B)
+terrain_classifier\analysis\matlab\run_all_subjects.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\run_all_subjects.m  (1,602 B)
+terrain_classifier\analysis\matlab\transition_conditions_AB06.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\transition_conditions_AB06.m  (9,862 B)
+terrain_classifier\analysis\matlab\turn_detection_emg_AB06.m
+    <- D:\ifac_wearable_contest\Camargo_matlab\turn_detection_emg_AB06.m  (9,064 B)
+terrain_classifier\analysis\python\analyze_feature_separability.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\analyze_feature_separability.py  (15,213 B)
+terrain_classifier\analysis\python\analyze_idle_as_class.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\analyze_idle_as_class.py  (7,139 B)
+terrain_classifier\analysis\python\analyze_locomotion_bank.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\analyze_locomotion_bank.py  (11,956 B)
+terrain_classifier\analysis\python\analyze_muscle_ranking.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\analyze_muscle_ranking.py  (7,373 B)
+terrain_classifier\analysis\python\camargo_common.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\camargo_common.py  (14,134 B)
+terrain_classifier\analysis\python\check_c_structure.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\check_c_structure.py  (5,006 B)
+terrain_classifier\analysis\python\count_contract.py
+    <- D:\ifac_wearable_contest\verify\count_contract.py  (1,178 B)
+terrain_classifier\analysis\python\extend_C_anthropometric_normalization.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\extend_C_anthropometric_normalization.py  (11,308 B)
+terrain_classifier\analysis\python\validate_12_threshold_sweep.py
+    <- D:\ifac_wearable_contest\verify\terrian_detection_minseo_h10_selected_clean8\terrian_detection_minseo\Camargo_matlab\validate_12_threshold_sweep.py  (10,600 B)
+terrain_classifier\analysis\python\validate_1_holdout_accuracy.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\validate_1_holdout_accuracy.py  (8,380 B)
+terrain_classifier\analysis\python\validate_2_template_stability.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\validate_2_template_stability.py  (4,557 B)
+terrain_classifier\analysis\python\validate_3_reverify_claims.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\validate_3_reverify_claims.py  (8,925 B)
+terrain_classifier\analysis\python\validate_4_calibration_robustness.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\validate_4_calibration_robustness.py  (5,123 B)
+terrain_classifier\analysis\python\validate_5_loso_cv.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\validate_5_loso_cv.py  (6,167 B)
+terrain_classifier\analysis\python\verify_resampling.py
+    <- D:\ifac_wearable_contest\Camargo_matlab\verify_resampling.py  (6,524 B)
+terrain_classifier\docs\AB11_AB28_outlier_analysis.md
+    <- D:\ifac_wearable_contest\Camargo_matlab\AB11_AB28_outlier_analysis.md  (4,863 B)
+terrain_classifier\docs\IMPROVEMENT_REPORT_v1.2.md
+    <- D:\ifac_wearable_contest\verify\terrian_detection_minseo_h10_selected_clean8\terrian_detection_minseo\User_Algorithm\IMPROVEMENT_REPORT.md  (8,336 B)
+terrain_classifier\docs\Locomotion_Mode_Classifier.md
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\Locomotion_Mode_Classifier.md  (27,939 B)
+terrain_classifier\docs\Locomotion_Mode_Classifier_Quiz_Guide.md
+    <- D:\ifac_wearable_contest\verify\terrian_detection_minseo_h10_selected_clean8\terrian_detection_minseo\User_Algorithm\Locomotion_Mode_Classifier_Quiz_Guide.md  (89,106 B)
+terrain_classifier\firmware\Locomotion_Mode_Classifier_v1.0.c
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\Locomotion_Mode_Classifier.c  (60,753 B)
+terrain_classifier\firmware\Locomotion_Mode_Classifier_v1.2.c
+    <- D:\ifac_wearable_contest\verify\terrian_detection_minseo_h10_selected_clean8\terrian_detection_minseo\User_Algorithm\Locomotion_Mode_Classifier.c  (67,069 B)
+terrain_classifier\firmware\Terrain_Intent_Classifier.c
+    <- D:\HARfinal\XM_Apps\User_Algorithm\Terrain_Intent_Classifier.c  (30,116 B)
+terrain_classifier\firmware\ref_curve_tables.h
+    <- D:\ifac_wearable_contest\XM_Apps\User_Algorithm\ref_curve_tables.h  (86,040 B)

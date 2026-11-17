@@ -1,0 +1,6233 @@
+{
+  "status": "locked_time_holdout_single_wearer_single_session",
+  "split_policy": {
+    "per_source_file": true,
+    "train": "time < 60 percent",
+    "dev": "60 percent <= time < 78 percent",
+    "test": "time >= 78 percent",
+    "embargo": "400 ms removed on both sides of the 60 and 78 percent boundaries",
+    "clock": "1 kHz row order; time_s is not used because USB chunks repeat timestamps"
+  },
+  "window_counts": {
+    "all": 10858,
+    "train": 6425,
+    "dev": 1776,
+    "test": 2305,
+    "embargo": 352
+  },
+  "selection": {
+    "state_model": {
+      "chosen_parameters": {
+        "max_depth": 16,
+        "min_samples_leaf": 2,
+        "max_features": "sqrt"
+      },
+      "criterion": "highest dev macro F1, then accuracy",
+      "candidates": [
+        {
+          "parameters": {
+            "max_depth": 16,
+            "min_samples_leaf": 2,
+            "max_features": "sqrt"
+          },
+          "support_50ms_windows": 1776,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "confusion_matrix": [
+            [
+              519,
+              0,
+              0
+            ],
+            [
+              0,
+              844,
+              0
+            ],
+            [
+              0,
+              0,
+              413
+            ]
+          ],
+          "labels": [
+            "stand",
+            "walk",
+            "jump"
+          ]
+        },
+        {
+          "parameters": {
+            "max_depth": 22,
+            "min_samples_leaf": 2,
+            "max_features": 0.6
+          },
+          "support_50ms_windows": 1776,
+          "accuracy": 0.9977477477477478,
+          "macro_f1": 0.9979224872841894,
+          "confusion_matrix": [
+            [
+              515,
+              4,
+              0
+            ],
+            [
+              0,
+              844,
+              0
+            ],
+            [
+              0,
+              0,
+              413
+            ]
+          ],
+          "labels": [
+            "stand",
+            "walk",
+            "jump"
+          ]
+        },
+        {
+          "parameters": {
+            "max_depth": null,
+            "min_samples_leaf": 3,
+            "max_features": 0.5
+          },
+          "support_50ms_windows": 1776,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "confusion_matrix": [
+            [
+              519,
+              0,
+              0
+            ],
+            [
+              0,
+              844,
+              0
+            ],
+            [
+              0,
+              0,
+              413
+            ]
+          ],
+          "labels": [
+            "stand",
+            "walk",
+            "jump"
+          ]
+        }
+      ]
+    },
+    "jump_event_threshold": {
+      "chosen": 0.325,
+      "criterion": "dev event F1, recall, precision, false triggers/min, latency; one-to-one match [-400,+150] ms",
+      "candidates": [
+        {
+          "threshold": 0.05,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 25,
+          "true_positive": 15,
+          "false_positive": 10,
+          "false_negative": 2,
+          "precision": 0.6,
+          "recall": 0.8823529411764706,
+          "f1": 0.7142857142857143,
+          "false_triggers_per_minute": 6.756756756756757,
+          "latency_ms": {
+            "values": [
+              -29,
+              -168,
+              -99,
+              -70,
+              -152,
+              -98,
+              -201,
+              -114,
+              -59,
+              -29,
+              -70,
+              -230,
+              -32,
+              -101,
+              -105
+            ],
+            "median": -99.0,
+            "p90": -30.200000000000003,
+            "minimum": -230,
+            "maximum": -29
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 16,
+              "matched": 7,
+              "false_triggers": 9,
+              "missed": 2,
+              "latency_ms": [
+                -29,
+                -168,
+                -99,
+                -70,
+                -152,
+                -98,
+                -201
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 6,
+              "matched": 5,
+              "false_triggers": 1,
+              "missed": 0,
+              "latency_ms": [
+                -114,
+                -59,
+                -29,
+                -70,
+                -230
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -105
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.075,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 24,
+          "true_positive": 15,
+          "false_positive": 9,
+          "false_negative": 2,
+          "precision": 0.625,
+          "recall": 0.8823529411764706,
+          "f1": 0.7317073170731708,
+          "false_triggers_per_minute": 6.081081081081082,
+          "latency_ms": {
+            "values": [
+              -29,
+              -118,
+              -99,
+              -70,
+              -152,
+              -98,
+              -201,
+              -114,
+              -59,
+              -29,
+              -70,
+              -230,
+              -32,
+              -101,
+              -105
+            ],
+            "median": -99.0,
+            "p90": -30.200000000000003,
+            "minimum": -230,
+            "maximum": -29
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 15,
+              "matched": 7,
+              "false_triggers": 8,
+              "missed": 2,
+              "latency_ms": [
+                -29,
+                -118,
+                -99,
+                -70,
+                -152,
+                -98,
+                -201
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 6,
+              "matched": 5,
+              "false_triggers": 1,
+              "missed": 0,
+              "latency_ms": [
+                -114,
+                -59,
+                -29,
+                -70,
+                -230
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -105
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.1,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 24,
+          "true_positive": 14,
+          "false_positive": 10,
+          "false_negative": 3,
+          "precision": 0.5833333333333334,
+          "recall": 0.8235294117647058,
+          "f1": 0.6829268292682927,
+          "false_triggers_per_minute": 6.756756756756757,
+          "latency_ms": {
+            "values": [
+              -29,
+              -118,
+              -49,
+              -152,
+              -98,
+              -201,
+              -64,
+              -59,
+              -29,
+              -70,
+              -230,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -67.0,
+            "p90": -29.9,
+            "minimum": -230,
+            "maximum": -29
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 15,
+              "matched": 6,
+              "false_triggers": 9,
+              "missed": 3,
+              "latency_ms": [
+                -29,
+                -118,
+                -49,
+                -152,
+                -98,
+                -201
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 6,
+              "matched": 5,
+              "false_triggers": 1,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -59,
+                -29,
+                -70,
+                -230
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.125,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 21,
+          "true_positive": 14,
+          "false_positive": 7,
+          "false_negative": 3,
+          "precision": 0.6666666666666666,
+          "recall": 0.8235294117647058,
+          "f1": 0.7368421052631577,
+          "false_triggers_per_minute": 4.72972972972973,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -52,
+              -98,
+              -101,
+              -64,
+              -9,
+              -29,
+              -70,
+              -230,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -59.5,
+            "p90": -29.0,
+            "minimum": -230,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 13,
+              "matched": 6,
+              "false_triggers": 7,
+              "missed": 3,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -52,
+                -98,
+                -101
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -230
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.15,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 21,
+          "true_positive": 14,
+          "false_positive": 7,
+          "false_negative": 3,
+          "precision": 0.6666666666666666,
+          "recall": 0.8235294117647058,
+          "f1": 0.7368421052631577,
+          "false_triggers_per_minute": 4.72972972972973,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -52,
+              -98,
+              -101,
+              -64,
+              -9,
+              -29,
+              -70,
+              -230,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -59.5,
+            "p90": -29.0,
+            "minimum": -230,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 13,
+              "matched": 6,
+              "false_triggers": 7,
+              "missed": 3,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -52,
+                -98,
+                -101
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -230
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.175,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 20,
+          "true_positive": 12,
+          "false_positive": 8,
+          "false_negative": 5,
+          "precision": 0.6,
+          "recall": 0.7058823529411765,
+          "f1": 0.6486486486486486,
+          "false_triggers_per_minute": 5.405405405405405,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -101,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -59.5,
+            "p90": -29.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 12,
+              "matched": 4,
+              "false_triggers": 8,
+              "missed": 5,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -101
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.2,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 20,
+          "true_positive": 13,
+          "false_positive": 7,
+          "false_negative": 4,
+          "precision": 0.65,
+          "recall": 0.7647058823529411,
+          "f1": 0.7027027027027027,
+          "false_triggers_per_minute": 4.72972972972973,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -85,
+              -51,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -55.0,
+            "p90": -29.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 12,
+              "matched": 5,
+              "false_triggers": 7,
+              "missed": 4,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -85,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.225,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 19,
+          "true_positive": 13,
+          "false_positive": 6,
+          "false_negative": 4,
+          "precision": 0.6842105263157895,
+          "recall": 0.7647058823529411,
+          "f1": 0.7222222222222222,
+          "false_triggers_per_minute": 4.054054054054054,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -85,
+              -301,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -64.0,
+            "p90": -29.0,
+            "minimum": -301,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 11,
+              "matched": 5,
+              "false_triggers": 6,
+              "missed": 4,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -85,
+                -301
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.25,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 19,
+          "true_positive": 16,
+          "false_positive": 3,
+          "false_negative": 1,
+          "precision": 0.8421052631578947,
+          "recall": 0.9411764705882353,
+          "f1": 0.8888888888888888,
+          "false_triggers_per_minute": 2.027027027027027,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -301,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -53.5,
+            "p90": -24.5,
+            "minimum": -301,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 11,
+              "matched": 8,
+              "false_triggers": 3,
+              "missed": 1,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -301
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.275,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 18,
+          "true_positive": 16,
+          "false_positive": 2,
+          "false_negative": 1,
+          "precision": 0.8888888888888888,
+          "recall": 0.9411764705882353,
+          "f1": 0.9142857142857143,
+          "false_triggers_per_minute": 1.3513513513513513,
+          "latency_ms": {
+            "values": [
+              -29,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -301,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -53.5,
+            "p90": -24.5,
+            "minimum": -301,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 10,
+              "matched": 8,
+              "false_triggers": 2,
+              "missed": 1,
+              "latency_ms": [
+                -29,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -301
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.3,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 14,
+          "false_positive": 3,
+          "false_negative": 3,
+          "precision": 0.8235294117647058,
+          "recall": 0.8235294117647058,
+          "f1": 0.8235294117647058,
+          "false_triggers_per_minute": 2.027027027027027,
+          "latency_ms": {
+            "values": [
+              -29,
+              -20,
+              -52,
+              -48,
+              -85,
+              -301,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -53.5,
+            "p90": -22.69999999999999,
+            "minimum": -301,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 6,
+              "false_triggers": 3,
+              "missed": 3,
+              "latency_ms": [
+                -29,
+                -20,
+                -52,
+                -48,
+                -85,
+                -301
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.325,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -301,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -55.0,
+            "p90": -25.4,
+            "minimum": -301,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -301
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.35,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -51,
+              -64,
+              -9,
+              -29,
+              -70,
+              -180,
+              -32,
+              -101,
+              -55
+            ],
+            "median": -52.0,
+            "p90": -25.4,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -70,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -101,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.375,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -51.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.4,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -51.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.425,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -85,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -51.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -85,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.45,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -35,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -49.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.475,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -35,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -49.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.5,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -35,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -49.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.525,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -35,
+              -51,
+              -64,
+              -9,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -49.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": -9
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                -9,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.55,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -88,
+              -68,
+              -49,
+              -20,
+              -52,
+              -48,
+              -35,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -49.0,
+            "p90": -20.0,
+            "minimum": -180,
+            "maximum": 41
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -88,
+                -68,
+                -49,
+                -20,
+                -52,
+                -48,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.575,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              2,
+              -35,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": -11.199999999999992,
+            "minimum": -180,
+            "maximum": 41
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                2,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.6,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              2,
+              -35,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": -11.199999999999992,
+            "minimum": -180,
+            "maximum": 41
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                2,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.625,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              2,
+              -35,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": -11.199999999999992,
+            "minimum": -180,
+            "maximum": 41
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                2,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.65,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              52,
+              -35,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -180,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": 4.40000000000002,
+            "minimum": -180,
+            "maximum": 52
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                52,
+                -35,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -180
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.675,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              52,
+              15,
+              -51,
+              -64,
+              41,
+              -29,
+              -20,
+              -130,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": 25.40000000000001,
+            "minimum": -130,
+            "maximum": 52
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                52,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                -29,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.7,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 17,
+          "true_positive": 17,
+          "false_positive": 0,
+          "false_negative": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -52,
+              52,
+              15,
+              -51,
+              -64,
+              41,
+              21,
+              -20,
+              -130,
+              -32,
+              -51,
+              -55
+            ],
+            "median": -38.0,
+            "p90": 29.000000000000007,
+            "minimum": -130,
+            "maximum": 52
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 9,
+              "matched": 9,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -52,
+                52,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                41,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -32,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.725,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 16,
+          "true_positive": 16,
+          "false_positive": 0,
+          "false_negative": 1,
+          "precision": 1.0,
+          "recall": 0.9411764705882353,
+          "f1": 0.9696969696969697,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              -49,
+              -20,
+              -2,
+              15,
+              -51,
+              -64,
+              91,
+              21,
+              -20,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -33.5,
+            "p90": 19.5,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 8,
+              "matched": 8,
+              "false_triggers": 0,
+              "missed": 1,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                -49,
+                -20,
+                -2,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.75,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 16,
+          "true_positive": 16,
+          "false_positive": 0,
+          "false_negative": 1,
+          "precision": 1.0,
+          "recall": 0.9411764705882353,
+          "f1": 0.9696969696969697,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -68,
+              1,
+              -20,
+              -2,
+              15,
+              -51,
+              -64,
+              91,
+              21,
+              -20,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -24.5,
+            "p90": 19.5,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 8,
+              "matched": 8,
+              "false_triggers": 0,
+              "missed": 1,
+              "latency_ms": [
+                -29,
+                -38,
+                -68,
+                1,
+                -20,
+                -2,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.775,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 16,
+          "true_positive": 16,
+          "false_positive": 0,
+          "false_negative": 1,
+          "precision": 1.0,
+          "recall": 0.9411764705882353,
+          "f1": 0.9696969696969697,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -18,
+              1,
+              -20,
+              -2,
+              15,
+              -51,
+              -64,
+              91,
+              21,
+              -20,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -20.0,
+            "p90": 19.5,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 8,
+              "matched": 8,
+              "false_triggers": 0,
+              "missed": 1,
+              "latency_ms": [
+                -29,
+                -38,
+                -18,
+                1,
+                -20,
+                -2,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.8,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 15,
+          "true_positive": 15,
+          "false_positive": 0,
+          "false_negative": 2,
+          "precision": 1.0,
+          "recall": 0.8823529411764706,
+          "f1": 0.9375,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -18,
+              -20,
+              -2,
+              15,
+              -51,
+              -64,
+              91,
+              21,
+              -20,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -20.0,
+            "p90": 19.799999999999997,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 7,
+              "matched": 7,
+              "false_triggers": 0,
+              "missed": 2,
+              "latency_ms": [
+                -29,
+                -38,
+                -18,
+                -20,
+                -2,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.825,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 15,
+          "true_positive": 15,
+          "false_positive": 0,
+          "false_negative": 2,
+          "precision": 1.0,
+          "recall": 0.8823529411764706,
+          "f1": 0.9375,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -18,
+              -20,
+              -2,
+              15,
+              -51,
+              -64,
+              91,
+              21,
+              -20,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -20.0,
+            "p90": 19.799999999999997,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 7,
+              "matched": 7,
+              "false_triggers": 0,
+              "missed": 2,
+              "latency_ms": [
+                -29,
+                -38,
+                -18,
+                -20,
+                -2,
+                15,
+                -51
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                -20,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.85,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 15,
+          "true_positive": 15,
+          "false_positive": 0,
+          "false_negative": 2,
+          "precision": 1.0,
+          "recall": 0.8823529411764706,
+          "f1": 0.9375,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -18,
+              -20,
+              -2,
+              15,
+              -1,
+              -64,
+              91,
+              21,
+              30,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -18.0,
+            "p90": 26.4,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 7,
+              "matched": 7,
+              "false_triggers": 0,
+              "missed": 2,
+              "latency_ms": [
+                -29,
+                -38,
+                -18,
+                -20,
+                -2,
+                15,
+                -1
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                30,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.875,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 14,
+          "true_positive": 14,
+          "false_positive": 0,
+          "false_negative": 3,
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -38,
+              -18,
+              30,
+              -2,
+              -1,
+              -64,
+              91,
+              21,
+              30,
+              -130,
+              18,
+              -51,
+              -55
+            ],
+            "median": -10.0,
+            "p90": 30.0,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 6,
+              "matched": 6,
+              "false_triggers": 0,
+              "missed": 3,
+              "latency_ms": [
+                -29,
+                -38,
+                -18,
+                30,
+                -2,
+                -1
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -64,
+                91,
+                21,
+                30,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -55
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.9,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 10,
+          "true_positive": 10,
+          "false_positive": 0,
+          "false_negative": 7,
+          "precision": 1.0,
+          "recall": 0.5882352941176471,
+          "f1": 0.7407407407407407,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              30,
+              -14,
+              91,
+              21,
+              30,
+              -130,
+              18,
+              -51,
+              -5
+            ],
+            "median": 6.5,
+            "p90": 36.09999999999998,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 2,
+              "matched": 2,
+              "false_triggers": 0,
+              "missed": 7,
+              "latency_ms": [
+                -29,
+                30
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -14,
+                91,
+                21,
+                30,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                18,
+                -51,
+                -5
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.925,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 10,
+          "true_positive": 10,
+          "false_positive": 0,
+          "false_negative": 7,
+          "precision": 1.0,
+          "recall": 0.5882352941176471,
+          "f1": 0.7407407407407407,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              30,
+              -14,
+              91,
+              71,
+              30,
+              -130,
+              68,
+              -51,
+              -5
+            ],
+            "median": 12.5,
+            "p90": 73.0,
+            "minimum": -130,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 2,
+              "matched": 2,
+              "false_triggers": 0,
+              "missed": 7,
+              "latency_ms": [
+                -29,
+                30
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -14,
+                91,
+                71,
+                30,
+                -130
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 3,
+              "matched": 3,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                68,
+                -51,
+                -5
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        },
+        {
+          "threshold": 0.95,
+          "match_window_ms": [
+            -400,
+            150
+          ],
+          "truth_events": 17,
+          "triggers": 8,
+          "true_positive": 8,
+          "false_positive": 0,
+          "false_negative": 9,
+          "precision": 1.0,
+          "recall": 0.47058823529411764,
+          "f1": 0.6399999999999999,
+          "false_triggers_per_minute": 0.0,
+          "latency_ms": {
+            "values": [
+              -29,
+              -14,
+              91,
+              71,
+              30,
+              -80,
+              -1,
+              -5
+            ],
+            "median": -3.0,
+            "p90": 77.0,
+            "minimum": -80,
+            "maximum": 91
+          },
+          "per_source": [
+            {
+              "source_key": "stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_1",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_2",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "walk_3",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "run",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "jump_1",
+              "truth_events": 9,
+              "triggers": 1,
+              "matched": 1,
+              "false_triggers": 0,
+              "missed": 8,
+              "latency_ms": [
+                -29
+              ]
+            },
+            {
+              "source_key": "jump_2",
+              "truth_events": 5,
+              "triggers": 5,
+              "matched": 5,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": [
+                -14,
+                91,
+                71,
+                30,
+                -80
+              ]
+            },
+            {
+              "source_key": "jump_3",
+              "truth_events": 3,
+              "triggers": 2,
+              "matched": 2,
+              "false_triggers": 0,
+              "missed": 1,
+              "latency_ms": [
+                -1,
+                -5
+              ]
+            },
+            {
+              "source_key": "sit_stand",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_clw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            },
+            {
+              "source_key": "turn_ccw",
+              "truth_events": 0,
+              "triggers": 0,
+              "matched": 0,
+              "false_triggers": 0,
+              "missed": 0,
+              "latency_ms": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "locked_test": {
+    "state": {
+      "support_50ms_windows": 2305,
+      "accuracy": 0.9978308026030369,
+      "macro_f1": 0.9972382720841697,
+      "confusion_matrix": [
+        [
+          679,
+          0,
+          4
+        ],
+        [
+          0,
+          1082,
+          0
+        ],
+        [
+          1,
+          0,
+          539
+        ]
+      ],
+      "labels": [
+        "stand",
+        "walk",
+        "jump"
+      ]
+    },
+    "jump_event": {
+      "threshold": 0.325,
+      "match_window_ms": [
+        -400,
+        150
+      ],
+      "truth_events": 21,
+      "triggers": 22,
+      "true_positive": 21,
+      "false_positive": 1,
+      "false_negative": 0,
+      "precision": 0.9545454545454546,
+      "recall": 1.0,
+      "f1": 0.9767441860465117,
+      "false_triggers_per_minute": 0.5206073752711496,
+      "latency_ms": {
+        "values": [
+          -97,
+          -85,
+          -105,
+          -20,
+          -14,
+          -63,
+          -39,
+          -88,
+          -48,
+          -23,
+          -68,
+          -165,
+          -17,
+          -204,
+          -160,
+          -80,
+          -215,
+          -65,
+          -83,
+          -66,
+          -69
+        ],
+        "median": -69.0,
+        "p90": -20.0,
+        "minimum": -215,
+        "maximum": -14
+      },
+      "per_source": [
+        {
+          "source_key": "stand",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "walk_1",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "walk_2",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "walk_3",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "run",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "jump_1",
+          "truth_events": 11,
+          "triggers": 12,
+          "matched": 11,
+          "false_triggers": 1,
+          "missed": 0,
+          "latency_ms": [
+            -97,
+            -85,
+            -105,
+            -20,
+            -14,
+            -63,
+            -39,
+            -88,
+            -48,
+            -23,
+            -68
+          ]
+        },
+        {
+          "source_key": "jump_2",
+          "truth_events": 6,
+          "triggers": 6,
+          "matched": 6,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": [
+            -165,
+            -17,
+            -204,
+            -160,
+            -80,
+            -215
+          ]
+        },
+        {
+          "source_key": "jump_3",
+          "truth_events": 4,
+          "triggers": 4,
+          "matched": 4,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": [
+            -65,
+            -83,
+            -66,
+            -69
+          ]
+        },
+        {
+          "source_key": "sit_stand",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "turn_clw",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        },
+        {
+          "source_key": "turn_ccw",
+          "truth_events": 0,
+          "triggers": 0,
+          "matched": 0,
+          "false_triggers": 0,
+          "missed": 0,
+          "latency_ms": []
+        }
+      ],
+      "window_average_precision": 0.8033025533622156,
+      "window_threshold_f1": 0.8087431693989071,
+      "window_threshold_precision": 0.7474747474747475,
+      "window_threshold_recall": 0.8809523809523809
+    },
+    "walk_intensity": {
+      "support_50ms_windows": 1082,
+      "mae_0_to_1": 0.009018221552504016,
+      "rmse_0_to_1": 0.022045902333003735,
+      "nearest_level_accuracy": 1.0
+    },
+    "jump_intensity": {
+      "support_50ms_windows": 540,
+      "mae_0_to_1": 0.04264781265922146,
+      "rmse_0_to_1": 0.07362930673784442,
+      "nearest_level_accuracy": 0.9740740740740741
+    }
+  },
+  "crouch_contract": {
+    "family": "bilateral_full_flexion_plateau_v1",
+    "authority": "training_rows_only",
+    "neutral_angle_deg": [
+      -2.17529297,
+      0.43945312
+    ],
+    "direction": [
+      1,
+      1
+    ],
+    "full_flexion_statistic": "sit_stand directed angle q95 relative to stand median",
+    "full_flexion_span_deg": [
+      98.34960938,
+      98.9428711
+    ],
+    "enter_fraction": 0.95,
+    "enter_confirm_ticks": 2,
+    "release_fraction": 0.95,
+    "plateau_max_velocity_dps": 30.0,
+    "release_ascent_velocity_dps": 30.0,
+    "semantic": "SHIFT is held only after both hips reach at least 95 percent of their training maximum for two ticks; otherwise SHIFT is released"
+  },
+  "claim_boundary": "실제 센서 CSV의 파일 내부 시간 홀드아웃 결과다. 자유 전환을 한 번에 수집한 독립 로그, Windows CDC, Minecraft 키 출력 검증은 아니다."
+}

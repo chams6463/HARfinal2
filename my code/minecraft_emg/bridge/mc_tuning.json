@@ -1,0 +1,46 @@
+{
+  "_comment": "핫리로드됨 — 저장하면 1초 안에 브릿지에 반영된다. 브릿지 재시작 불필요.",
+
+  "_1_emg": "오늘 붙인 전극 기준. 캘리브레이션으로 실측해서 채울 것.",
+  "thigh_rest": 0.050,
+  "thigh_mvc":  0.600,
+  "calf_rest":  0.040,
+  "calf_mvc":   0.450,
+  "emg_thigh_weight": 0.8,
+  "emg_calf_weight":  0.2,
+
+  "_2_stand": "고관절 각속도(deg/s) 문턱. start/stop 을 다르게 두는 것이 히스테리시스.",
+  "stand_gyro_start": 30.0,
+  "stand_gyro_stop":  20.0,
+
+  "_3_run": "이 둘 중 하나라도 넘으면 RUN 으로 본다.",
+  "run_gyro_th": 110.0,
+  "run_vel_th":  1.9,
+
+  "_4_turn": "몸통 회전 -> 시야 회전. gain 은 몸 1도당 마우스 픽셀.",
+  "turn_deadzone_dps": 8.0,
+  "turn_gain":         3.0,
+  "turn_max_dps":      180.0,
+
+  "_5_speed": "이동상태별 속도 구간(0~1). 근활성이 구간 안에서 미세조정한다.",
+  "walk_band_lo": 0.25,
+  "walk_band_hi": 0.55,
+  "run_band_lo":  0.60,
+  "run_band_hi":  1.00,
+  "move_threshold": 0.05,
+  "attack_ms":  60,
+  "release_ms": 180,
+
+  "_6_attr": "base_speed 0.1 은 바닐라 기본값. 건드리지 말 것.",
+  "base_speed": 0.1,
+  "speed_min":  0.3,
+  "speed_max":  2.5,
+  "attribute_id": "minecraft:movement_speed",
+
+  "_7_model": "모델 확신이 이보다 낮으면 직전 판정을 유지한다.",
+  "model_min_conf": 0.55,
+
+  "_8_rcon": "RCON 커맨드는 서버 틱에서 파싱되므로 송신을 억제한다.",
+  "tx_deadband":       0.01,
+  "tx_min_interval_s": 0.05
+}
